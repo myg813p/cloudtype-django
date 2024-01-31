@@ -49,6 +49,10 @@ async function handleSignin(){
 }
 
 async function handleLogin(){
+    document.getElementById("loadingOverlay").classList.remove("d-none");
+    document.getElementById("loadingSpinner").classList.remove("d-none");
+
+
     const loginData = {
         username : document.getElementById("floatingInputUsername").value,
         password : document.getElementById("floatingInputPassword").value,
@@ -65,6 +69,9 @@ async function handleLogin(){
     response_json = await response.json()
 
     if(response.status == 200){
+        document.getElementById("loadingOverlay").classList.add("d-none");
+        document.getElementById("loadingSpinner").classList.add("d-none");
+
         localStorage.setItem("access", response_json.access);
         localStorage.setItem("refresh", response_json.refresh);
 
@@ -77,6 +84,9 @@ async function handleLogin(){
         localStorage.setItem("payload", jsonPayload);
         window.location.replace(indexPath);
     }else {
+        document.getElementById("loadingOverlay").classList.add("d-none");
+        document.getElementById("loadingSpinner").classList.add("d-none");
+
         if (response.status == 401){
             alert("아이디, 비밀번호를 확인하세요.\n계정이 없다면 회원가입을 진행해 주세요.")
         } else if (response.status == 400) {
