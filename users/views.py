@@ -77,16 +77,20 @@ class ChangePassword(APIView):
         # find user by username
         user = UserModel.objects.filter(username=username).first()
 
-        if user and check_password(floatingInputPassword, user.password):
-            # password check successful, update password
-            user.set_password(floatingInputNewPassword)
-            user.save()
+        if user:
+            if check_password(floatingInputPassword, user.password):
+                # Passwords match, update password
+                user.set_password(floatingInputNewPassword)
+                user.save()
 
-            # Return the username in the response
-            return Response({'message': '비밀번호 변경 성공!'}, status=status.HTTP_200_OK)
+                # Return success message
+                return Response({'message': '비밀번호 변경 성공!'}, status=status.HTTP_200_OK)
+            else:
+                # If passwords don't match, return failure message
+                return Response({'message': '실패! 비밀번호가 잘못되었습니다.'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            # If no matching user or password is incorrect, return an appropriate response
-            return Response({'message': '유효하지 않은 사용자 또는 비밀번호가 잘못되었습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            # If no matching user, return failure message
+            return Response({'message': '실패! 유효하지 않은 사용자입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserView(APIView):
 
