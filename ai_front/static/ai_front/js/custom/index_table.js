@@ -220,8 +220,8 @@ function othersStart(biz_no) {
       }
       if (dataFromUrl2 != undefined) {
         jsonToTable(dataFromUrl2, "coupang");
-      } else {
-        console.log("no data");
+      } 
+      if (dataFromUrl1 == undefined && dataFromUrl2 == undefined) {
         tableContainerDiv.textContent = "이벤트 내역이 없습니다.";
       }
     })
