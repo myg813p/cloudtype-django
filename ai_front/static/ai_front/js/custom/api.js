@@ -31,7 +31,7 @@ async function handleSignin(){
         method:'POST',
         body:JSON.stringify(signupData)
     })
-    document.getElementById("lgBtn").style.display = "block";
+    document.getElementById("rgBtn").style.display = "block";
     document.getElementById("loadingOverlay").classList.add("d-none");
     document.getElementById("loadingSpinner").classList.add("d-none");
 
@@ -41,13 +41,13 @@ async function handleSignin(){
         alert("회원가입이 완료되었습니다.\n로그인해주세요.")
         window.location.replace(loginPath);
     } else if(response.status == 403){
-        alert(`${response.status}\n아름넷에 등록되지 않은 사업자입니다.\n사업자번호 확인 또는 관리자에게 문의하세요.`)
+        alert(`${response.status}\n아름넷에 등록되지 않은 사업자이거나\n사업자번호와 대표자가 일치하지 않습니다.\n사업자번호, 대표자명 확인 또는 관리자에게 문의하세요.`)
     } else if(response.status == 400){
         if (response_json.message == 'username'){
             alert('이미 사용되는 아이디거나 입력되지 않았습니다.');
             document.getElementById("floatingInputUsername").focus();
         } else if (response_json.message == 'biz_no'){
-            alert('이미 등록된 사업자번호이거나 입력되지 않습니다.');
+            alert('이미 등록된 사업자번호이거나 대표자와 일치하지 않습니다.');
             document.getElementById("floatingInputBizOwner").focus();
         } else if (response_json.message == 'biz_email'){
             alert('이메일 양식이 맞지 않습니다.');

@@ -109,7 +109,8 @@ class UserView(APIView):
         serializer = UserSignupSerializer(data=request.data)
 
         if serializer.is_valid():
-            arm_user = ArmUsers.objects.filter(biz_no=serializer.validated_data['biz_no']).first()
+            arm_user = ArmUsers.objects.filter(biz_no=serializer.validated_data['biz_no'], biz_owner=serializer.validated_data['biz_owner']).first()
+
             if arm_user:
                 serializer.validated_data['cust_id'] = ""
                 serializer.validated_data['cust_nm'] = arm_user.cust_nm
