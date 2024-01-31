@@ -1,4 +1,5 @@
 async function handleSignin(){
+    document.getElementById("rgBtn").style.display = "none";
     document.getElementById("loadingOverlay").classList.remove("d-none");
     document.getElementById("loadingSpinner").classList.remove("d-none");
 
@@ -15,6 +16,7 @@ async function handleSignin(){
     }
 
     if (Repeatpassword != signupData.password){
+        document.getElementById("rgBtn").style.display = "block";
         document.getElementById("loadingOverlay").classList.add("d-none");
         document.getElementById("loadingSpinner").classList.add("d-none");
         alert("패스워드가 일치하지 않습니다.")
@@ -29,7 +31,7 @@ async function handleSignin(){
         method:'POST',
         body:JSON.stringify(signupData)
     })
-
+    document.getElementById("lgBtn").style.display = "block";
     document.getElementById("loadingOverlay").classList.add("d-none");
     document.getElementById("loadingSpinner").classList.add("d-none");
 
@@ -57,6 +59,7 @@ async function handleSignin(){
 }
 
 async function handleLogin(){
+    document.getElementById("lgBtn").style.display = "none";
     document.getElementById("loadingOverlay").classList.remove("d-none");
     document.getElementById("loadingSpinner").classList.remove("d-none");
 
@@ -75,10 +78,11 @@ async function handleLogin(){
     })
 
     response_json = await response.json()
+    document.getElementById("lgBtn").style.display = "block";
+    document.getElementById("loadingOverlay").classList.add("d-none");
+    document.getElementById("loadingSpinner").classList.add("d-none");
 
     if(response.status == 200){
-        document.getElementById("loadingOverlay").classList.add("d-none");
-        document.getElementById("loadingSpinner").classList.add("d-none");
 
         localStorage.setItem("access", response_json.access);
         localStorage.setItem("refresh", response_json.refresh);
@@ -92,9 +96,6 @@ async function handleLogin(){
         localStorage.setItem("payload", jsonPayload);
         window.location.replace(indexPath);
     }else {
-        document.getElementById("loadingOverlay").classList.add("d-none");
-        document.getElementById("loadingSpinner").classList.add("d-none");
-
         if (response.status == 401){
             alert("아이디, 비밀번호를 확인하세요.\n계정이 없다면 회원가입을 진행해 주세요.")
         } else if (response.status == 400) {

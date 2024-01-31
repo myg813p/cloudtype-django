@@ -546,9 +546,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //비밀번호 변경
 function changePassword() {
-  document.getElementById("loadingOverlay").classList.remove("d-none");
-  document.getElementById("loadingSpinner").classList.remove("d-none");
-
 
   admincheck = localStorage.username
 
@@ -565,6 +562,8 @@ function changePassword() {
   } else if (floatingInputPassword== floatingInputNewPassword) {
     alert("동일한 비밀번호로 변경 할 수 없습니다.")
   } else {
+    document.getElementById("loadingOverlay").classList.remove("d-none");
+    document.getElementById("loadingSpinner").classList.remove("d-none");
     const url = "/users/api/changepassword";
 
     // Sending data in the request body for a POST request
