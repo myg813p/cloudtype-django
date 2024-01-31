@@ -131,6 +131,5 @@ class UserView(APIView):
     def delete(self, request):
         return Response({"message": "delete method!!"})
 
-
 class SpartaTokenObtainPairView(TokenObtainPairView):
     serializer_class = SpartaTokenObtainPairSerializer
