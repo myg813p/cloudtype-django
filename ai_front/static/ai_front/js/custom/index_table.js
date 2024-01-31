@@ -583,7 +583,7 @@ function changePassword() {
         document.getElementById("loadingOverlay").classList.add("d-none");
         document.getElementById("loadingSpinner").classList.add("d-none");
 
-        if (data.message !== "User not found") {
+        if (response.status == 200) {
           alert(
             `${data.message}\n다시 로그인하세요.`
           );
