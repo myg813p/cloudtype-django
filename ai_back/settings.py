@@ -89,12 +89,9 @@ WSGI_APPLICATION = 'ai_back.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'mariadb': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'kiyoung',
         'USER': 'root',
@@ -103,6 +100,22 @@ DATABASES = {
         'PORT': '32691',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     },
+#     'mariadb': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'kiyoung',
+#         'USER': 'root',
+#         'PASSWORD': '#dpg85kjp',
+#         'HOST': 'svc.sel5.cloudtype.app',
+#         'PORT': '32691',
+#     }
+# }
 
 DATABASE_ROUTERS = ['ai_front.routers.MariadbRouter']
 

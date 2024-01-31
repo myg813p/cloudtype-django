@@ -78,11 +78,9 @@ async function handleLogin(){
         window.location.replace(indexPath);
     }else {
         if (response.status == 401){
-            alert("아이디, 비밀번호를 확인하세요.\n계정이 없다면 회원가입을 진행해 주세요.");
+            alert("아이디, 비밀번호를 확인하세요.\n계정이 없다면 회원가입을 진행해 주세요.")
         } else if (response.status == 400) {
-            alert("잘못된 요청입니다.");
-        } else {
-            alert("아이디 비밀번호를 확인하세요.");
+            alert("잘못된 요청입니다.")
         }
     }
 }

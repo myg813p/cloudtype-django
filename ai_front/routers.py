@@ -1,12 +1,12 @@
 class MariadbRouter:
     def db_for_read(self, model, **hints):
         if model._meta.app_label == 'ai_front':
-            return 'mariadb'
+            return 'default'
         return None
 
     def db_for_write(self, model, **hints):
         if model._meta.app_label == 'ai_front':
-            return 'mariadb'
+            return 'default'
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
@@ -19,5 +19,5 @@ class MariadbRouter:
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         if app_label == 'ai_front':
-            return db == 'mariadb'
+            return db == 'default'
         return None
