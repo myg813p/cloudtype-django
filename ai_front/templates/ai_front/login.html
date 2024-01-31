@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'ai_front/header_footer/header_login.html' %}
+    <title>login.html</title>
+</head>
+
+<body class="bg-gradient-primary custom-font">
+
+    <div class="container">
+
+        <!-- Outer Row -->
+        <div class="row justify-content-center">
+
+            <div class="col-xl-10 col-lg-12 col-md-9">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <!-- Nested Row within Card Body -->
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">어서오세요!</h1>
+                                    </div>
+                                    <form class="user">
+                                        <!-- id -->
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-user" id="floatingInputUsername" placeholder="아이디">
+                                        </div>
+                                        <!-- pw -->
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                id="floatingInputPassword" placeholder="비밀번호">
+                                        </div>
+                                        <!-- button -->
+                                        <a id="lgBtn" class="btn btn-primary btn-user btn-block" onclick="handleLogin()">
+                                            로그인
+                                        </a>
+                                    </form>
+                                    <hr>
+                                    <div class="text-center">
+                                        <a class="small" href="{% url 'forgot_id' %}">아이디 찾기</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small" href="{% url 'forgot_password' %}">비밀번호 찾기</a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a class="small" href="{% url 'register' %}">신규가입하기</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    {% include 'ai_front/header_footer/footer_login.html' %}
+
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+/* Custom CSS for the table */
+.jsonData2 th {
+    background-color: #0080ff; /* Dark color for header */
+    color: white; /* Text color for header */
+    font-size: 13px; /* Font size for header */
+    border: none; /* Use 'border' property to remove borders */
+}
+
+.jsonData2 td {
+    font-size: 12px; /* Font size for data cells */
+    border: none; /* Use 'border' property to remove borders */
+}

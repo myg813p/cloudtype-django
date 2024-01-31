@@ -1,0 +1,105 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>kyadmin.html</title>
+    {% include 'ai_front/header_footer/header.html' %}
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-size: 12px;
+        }
+
+        .highlight-yellow {
+            background-color: yellow !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>kyadmin</h1>
+
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                {% for column in columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+                <th>remark save</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in admin_sep %}
+                <tr id="row_{{ forloop.counter }}">
+                    {% for value in row %}
+                        {% if forloop.first %}
+                            <td><input type="text" placeholder="" value="{{ value }}" id="r{{ forloop.parentloop.counter }}{{ forloop.counter }}"></td>
+                        {% else %}
+                            {% if value is None %}
+                                <td id="r{{ forloop.parentloop.counter }}{{ forloop.counter }}" class="highlight-yellow">{{ value }}</td>
+                            {% else %}
+                            <td id="r{{ forloop.parentloop.counter }}{{ forloop.counter }}">{{ value }}</td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    <td><button type="button" onclick="remark_save('r{{ forloop.counter }}')">Save</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Include Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    function remark_save(rNo) {
+        // Log information from localStorage
+        console.log(localStorage.username);
+        console.log(localStorage.access);
+
+        // Get data from the HTML elements
+        const rawNo = document.getElementById(rNo + '2').textContent;
+        const remarkText = document.getElementById(rNo + '1').value;
+
+        // Log data from the HTML elements
+        console.log(rawNo);
+        console.log(remarkText);
+
+        // Make an API call
+        fetch('/api/SaveRemark/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: localStorage.access,  // Pass the access token as "token"
+                username: localStorage.username,
+                rawNo: rawNo,
+                remarkText: remarkText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.res == "saved"){
+                window.location.reload();
+            };
+            // Handle the response data as needed
+        })
+        .catch(error => {
+            console.error('API error:', error);
+            // Handle errors
+        });
+    }
+</script>
+
+
+
+
+</body>
+</html>

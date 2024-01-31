@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>register.html</title>
+    {% include 'ai_front/header_footer/header_login.html' %}
+</head>
+
+<body class="bg-gradient-primary custom-font">
+
+    <div class="container">
+
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">점주등록</h1>
+                            </div>
+                            <form class="user">
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" id="floatingInputUsername"
+                                        placeholder="아이디">
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input type="password" class="form-control form-control-user"
+                                            id="floatingInputPassword" placeholder="비밀번호">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control form-control-user"
+                                            id="floatingInputRepeatPassword" placeholder="비밀번호 확인">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" id="floatingInputBizOwner"
+                                        placeholder="대표자성명">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" id="floatingInputBizNo"
+                                        placeholder="사업자번호">
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="email" class="form-control form-control-user" id="floatingInputBizEmail"
+                                        placeholder="이메일">
+                                </div>
+                                <a class="btn btn-primary btn-user btn-block" onclick="handleSignin()">
+                                    등록하기
+                                </a>
+                                <hr>
+                            </form>
+                            <div class="text-center">
+                                <a class="small" href="{% url 'forgot_password' %}">비밀번호 찾기</a>
+                            </div>
+                            <div class="text-center">
+                                <a class="small" href="{% url 'login' %}">이미 등록했어요 로그인할래요.</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% include 'ai_front/header_footer/footer_login.html' %}
+
+</body>
+
+</html>
