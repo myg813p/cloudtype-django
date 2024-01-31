@@ -1,4 +1,7 @@
 async function handleSignin(){
+    document.getElementById("loadingOverlay").classList.remove("d-none");
+    document.getElementById("loadingSpinner").classList.remove("d-none");
+
     Repeatpassword = document.getElementById("floatingInputRepeatPassword").value
 
     const signupData = {
@@ -12,6 +15,8 @@ async function handleSignin(){
     }
 
     if (Repeatpassword != signupData.password){
+        document.getElementById("loadingOverlay").classList.add("d-none");
+        document.getElementById("loadingSpinner").classList.add("d-none");
         alert("패스워드가 일치하지 않습니다.")
         document.getElementById("floatingInputRepeatPassword").focus();
         return
@@ -24,6 +29,9 @@ async function handleSignin(){
         method:'POST',
         body:JSON.stringify(signupData)
     })
+
+    document.getElementById("loadingOverlay").classList.add("d-none");
+    document.getElementById("loadingSpinner").classList.add("d-none");
 
     response_json = await response.json()
 

@@ -546,6 +546,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //비밀번호 변경
 function changePassword() {
+  document.getElementById("loadingOverlay").classList.remove("d-none");
+  document.getElementById("loadingSpinner").classList.remove("d-none");
+
+
   admincheck = localStorage.username
 
   floatingInputPassword = document.getElementById("floatingInputPassword").value;
@@ -577,6 +581,9 @@ function changePassword() {
     })
       .then((response) => response.json())
       .then((data) => {
+        document.getElementById("loadingOverlay").classList.add("d-none");
+        document.getElementById("loadingSpinner").classList.add("d-none");
+
         if (data.message !== "User not found") {
           alert(
             `${data.message}\n다시 로그인하세요.`
