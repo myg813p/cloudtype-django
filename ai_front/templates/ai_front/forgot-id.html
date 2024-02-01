@@ -129,6 +129,10 @@
                   text: `고객님 아이디는 ${data.username} 입니다.`,
                   icon: "success",
                   confirmButtonText: "확인",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.replace(loginPath);
+                  }
                 });
               } else {
                 //alert("입력사항을 확인하세요.\n존재하지 않는 정보입니다.");
