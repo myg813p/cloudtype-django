@@ -81,12 +81,23 @@
 
     <script>
       function find_ID() {
+        document.getElementById("loadingOverlay").classList.remove("d-none");
+        document.getElementById("loadingSpinner").classList.remove("d-none");
+
         BizOwner = document.getElementById("floatingInputBizOwner").value;
         BizNo = document.getElementById("floatingInputBizNo").value;
         BizEmail = document.getElementById("floatingInputBizEmail").value;
 
         if (BizOwner == "" || BizNo == "" || BizEmail == "") {
-          alert("아이디, 비밀번호, 이메일을 모두 입력해주세요.");
+          document.getElementById("loadingOverlay").classList.add("d-none");
+          document.getElementById("loadingSpinner").classList.add("d-none");
+          //alert("성함, 사업자번호, 이메일을 모두 입력해주세요.");
+          Swal.fire({
+            // title: '패스워드!',
+            text: "성함, 사업자번호, 이메일을 모두 입력해주세요.",
+            icon: "warning",
+            confirmButtonText: "확인",
+          });
         } else {
           const url = "/users/api/findid";
 
@@ -104,10 +115,25 @@
           })
             .then((response) => response.json())
             .then((data) => {
+              document.getElementById("loadingOverlay").classList.add("d-none");
+              document.getElementById("loadingSpinner").classList.add("d-none");
+
               if (data.username !== "User not found") {
-                alert(`고객님 아이디는 ${data.username} 입니다.`);
+                //alert(`고객님 아이디는 ${data.username} 입니다.`);
+                Swal.fire({
+                  // title: '패스워드!',
+                  text: `고객님 아이디는 ${data.username} 입니다.`,
+                  icon: "success",
+                  confirmButtonText: "확인",
+                });
               } else {
-                alert("입력사항을 확인하세요.\n존재하지 않는 정보입니다.");
+                //alert("입력사항을 확인하세요.\n존재하지 않는 정보입니다.");
+                Swal.fire({
+                  // title: '패스워드!',
+                  text: "입력사항을 확인하세요.\n존재하지 않는 정보입니다.",
+                  icon: "warning",
+                  confirmButtonText: "확인",
+                });
               }
               console.log(data.username);
             })
