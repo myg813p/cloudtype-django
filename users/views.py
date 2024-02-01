@@ -16,9 +16,9 @@ from .main_gmail import auth_code
 
 class FindID(APIView):
     def post(self, request):
-        BizOwner = request.data['BizOwner']
-        BizNo = request.data['BizNo']
-        BizEmail = request.data['BizEmail']
+        BizOwner = request.data['BizOwner'].replace(' ', '')
+        BizNo = request.data['BizNo'].replace('-', '').replace(' ', '')
+        BizEmail = request.data['BizEmail'].replace(' ', '')
 
         print(BizOwner, BizNo, BizEmail)
 
@@ -36,10 +36,10 @@ class FindID(APIView):
 
 class FindPassword(APIView):
     def post(self, request):
-        username = request.data['username']
-        BizOwner = request.data['BizOwner']
-        BizNo = request.data['BizNo']
-        BizEmail = request.data['BizEmail']
+        username = request.data['username'].replace(' ', '')
+        BizOwner = request.data['BizOwner'].replace(' ', '')
+        BizNo = request.data['BizNo'].replace('-', '').replace(' ', '')
+        BizEmail = request.data['BizEmail'].replace(' ', '')
 
         print(BizOwner, BizNo, BizEmail)
 
@@ -58,10 +58,6 @@ class FindPassword(APIView):
 
             #인증 메일 발송
             auth_code(new_password, BizEmail)
-
-            print(BizEmail)
-
-
             # Return the username in the response
             return Response({'useremail': BizEmail}, status=status.HTTP_200_OK)
         else:

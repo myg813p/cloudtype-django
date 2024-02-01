@@ -5,11 +5,6 @@ import datetime
 
 def auth_code(new_password, receiver_email):
     try:
-        print('test')
-        print('test')
-        print('test')
-        print('test')
-
         sender_email = "gijungcpy@gmail.com"
         app_password = "mbvwslcnzmbnwykb"
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

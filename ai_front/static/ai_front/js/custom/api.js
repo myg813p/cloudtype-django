@@ -8,12 +8,53 @@ async function handleSignin() {
   const signupData = {
     username: document.getElementById("floatingInputUsername").value,
     password: document.getElementById("floatingInputPassword").value,
-    biz_owner: document.getElementById("floatingInputBizOwner").value,
-    biz_no: document.getElementById("floatingInputBizNo").value,
+    biz_owner: document
+      .getElementById("floatingInputBizOwner")
+      .value.replaceAll(" ", ""),
+    biz_no: document
+      .getElementById("floatingInputBizNo")
+      .value.replaceAll(" ", "")
+      .replaceAll("-", ""),
     cust_id: "",
     biz_email: document.getElementById("floatingInputBizEmail").value,
     test_code: "test",
   };
+
+  if (signupData.username.length < 6) {
+    document.getElementById("rgBtn").style.display = "block";
+    document.getElementById("loadingOverlay").classList.add("d-none");
+    document.getElementById("loadingSpinner").classList.add("d-none");
+    // alert("패스워드가 일치하지 않습니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "ID는 6자리 이상입니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById("floatingInputUsername").focus();
+      }
+    });
+    return;
+  }
+
+  if (signupData.password.length < 4) {
+    document.getElementById("rgBtn").style.display = "block";
+    document.getElementById("loadingOverlay").classList.add("d-none");
+    document.getElementById("loadingSpinner").classList.add("d-none");
+    // alert("패스워드가 일치하지 않습니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "패스워드는 4자리 이상입니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById("floatingInputPassword").focus();
+      }
+    });
+    return;
+  }
 
   if (Repeatpassword != signupData.password) {
     document.getElementById("rgBtn").style.display = "block";
@@ -25,8 +66,11 @@ async function handleSignin() {
       text: "패스워드가 일치하지 않습니다.",
       icon: "warning",
       confirmButtonText: "확인",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById("floatingInputRepeatPassword").focus();
+      }
     });
-    document.getElementById("floatingInputRepeatPassword").focus();
     return;
   }
 
@@ -50,8 +94,11 @@ async function handleSignin() {
       text: "회원가입이 완료되었습니다.\n로그인해주세요.",
       icon: "success",
       confirmButtonText: "확인",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.replace(loginPath);
+      }
     });
-    window.location.replace(loginPath);
   } else if (response_json.message == "none_arumnet") {
     // alert(`아름넷에 등록되지 않은 사업자이거나\n사업자번호와 대표자명이 일치하지 않습니다.\n사업자번호, 대표자명 확인 또는 관리자에게 문의하세요.`)
     Swal.fire({
@@ -77,8 +124,11 @@ async function handleSignin() {
         text: "이미 등록된 사업자번호이거나 대표자와 일치하지 않습니다.",
         icon: "warning",
         confirmButtonText: "확인",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById("floatingInputBizOwner").focus();
+        }
       });
-      document.getElementById("floatingInputBizOwner").focus();
     } else if (response_json.message == "biz_email") {
       // alert('이메일 양식이 맞지 않습니다.');
       Swal.fire({
@@ -86,8 +136,11 @@ async function handleSignin() {
         text: "이메일 양식이 맞지 않습니다.",
         icon: "warning",
         confirmButtonText: "확인",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById("floatingInputBizEmail").focus();
+        }
       });
-      document.getElementById("floatingInputBizEmail").focus();
     } else {
       // alert('잘못된 요청입니다.');
       Swal.fire({

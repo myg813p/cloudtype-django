@@ -568,7 +568,16 @@ function changePassword() {
       icon: "warning",
       confirmButtonText: "확인",
     });
-  } else if (floatingInputNewPassword!== floatingInputNewPasswordConfirm) {
+  } else if (floatingInputNewPassword.length < 4) {
+    // alert("변경 할 비밀번호가 일치하지 않습니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "변경 할 비밀번호는 4자리 이상입니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    document.getElementById("floatingInputNewPasswordConfirm").focus();
+  }  else if (floatingInputNewPassword!== floatingInputNewPasswordConfirm) {
     // alert("변경 할 비밀번호가 일치하지 않습니다.")
     Swal.fire({
       // title: '패스워드!',
@@ -613,11 +622,14 @@ function changePassword() {
           // );
           Swal.fire({
             // title: '패스워드!',
-            text:  `${data.message}\n다시 로그인하세요.`,
+            text: `${data.message}\n다시 로그인하세요.`,
             icon: "success",
             confirmButtonText: "확인",
-          });
+          }).then((result) => {
+            if (result.isConfirmed) {
           handleLogout();
+            }
+          });
         } else {
           // alert("현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.");
           Swal.fire({
