@@ -553,14 +553,38 @@ function changePassword() {
   floatingInputNewPassword = document.getElementById("floatingInputNewPassword").value;
   floatingInputNewPasswordConfirm = document.getElementById("floatingInputNewPasswordConfirm").value;
   if (admincheck == "admin") {
-    alert("어드민 계정은 비밀번호 수정이 불가합니다.")
+    // alert("어드민 계정은 비밀번호 수정이 불가합니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "어드민 계정은 비밀번호 수정이 불가합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
   } else if (floatingInputNewPassword == "" || floatingInputNewPasswordConfirm == "" || floatingInputPassword == "") {
-    alert("입력을 확인하세요.")
+    // alert("입력을 확인하세요.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "입력을 확인하세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
   } else if (floatingInputNewPassword!== floatingInputNewPasswordConfirm) {
-    alert("변경 할 비밀번호가 일치하지 않습니다.")
+    // alert("변경 할 비밀번호가 일치하지 않습니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "변경 할 비밀번호가 일치하지 않습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
     document.getElementById("floatingInputNewPasswordConfirm").focus();
   } else if (floatingInputPassword== floatingInputNewPassword) {
-    alert("동일한 비밀번호로 변경 할 수 없습니다.")
+    // alert("동일한 비밀번호로 변경 할 수 없습니다.")
+    Swal.fire({
+      // title: '패스워드!',
+      text: "동일한 비밀번호로 변경 할 수 없습니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
   } else {
     document.getElementById("loadingOverlay").classList.remove("d-none");
     document.getElementById("loadingSpinner").classList.remove("d-none");
@@ -584,12 +608,24 @@ function changePassword() {
         document.getElementById("loadingSpinner").classList.add("d-none");
 
         if (data.message == "비밀번호 변경 성공!") {
-          alert(
-            `${data.message}\n다시 로그인하세요.`
-          );
+          // alert(
+          //   `${data.message}\n다시 로그인하세요.`
+          // );
+          Swal.fire({
+            // title: '패스워드!',
+            text:  `${data.message}\n다시 로그인하세요.`,
+            icon: "success",
+            confirmButtonText: "확인",
+          });
           handleLogout();
         } else {
-          alert("현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.");
+          // alert("현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.");
+          Swal.fire({
+            // title: '패스워드!',
+            text:  `현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.`,
+            icon: "warning",
+            confirmButtonText: "확인",
+          });
           document.getElementById("floatingInputPassword").focus();
         }
         console.log(data.message);
