@@ -1,38 +1,34 @@
 const getUserData = async () => {
-  //고객 정보 들고오기
-  //고객 정보 들고오기
-  //고객 정보 들고오기
-  const accessToken = localStorage.getItem("access");
-  const response = await fetch(`/users/`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`, // Use backticks around the whole string
-    },
-  });
+  try {
+    const accessToken = localStorage.getItem("access");
+    const response = await fetch(`/users/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-  const userData = await response.json(); // Parse response data as JSON
-  localStorage.setItem("biz_owner", userData.biz_owner);
-  localStorage.setItem("username", userData.username);
-  localStorage.setItem("cust_nm", userData.cust_nm);
-  localStorage.setItem("biz_no", userData.biz_no);
+    const userData = await response.json();
+    localStorage.setItem("biz_owner", userData.biz_owner);
+    localStorage.setItem("username", userData.username);
+    localStorage.setItem("cust_nm", userData.cust_nm);
+    localStorage.setItem("biz_no", userData.biz_no);
 
-  document.getElementById(
-    "username"
-  ).textContent = `${userData.biz_owner}님 (${userData.username})`;
-  document.getElementById(
-    "userinfo"
-  ).textContent = `${userData.cust_nm} [${userData.biz_no}]`;
+    document.getElementById("username").textContent = `${userData.biz_owner}님 (${userData.username})`;
+    document.getElementById("userinfo").textContent = `${userData.cust_nm} [${userData.biz_no}]`;
 
-  // table show
-  // table show
-  // table show
-  if (userData.username === "admin") {
-    adminStart();
-    return;
-  } else {
-    othersStart(userData.biz_no);
-    return;
+    if (userData.username === "admin") {
+      adminStart();
+    } else {
+      othersStart(userData.biz_no);
+    }
+
+    return userData.username; // Return the username
+  } catch (error) {
+    console.error("An error occurred:", error);
+    // Handle the error or display a message to the user
+    return null; // Return null or handle error accordingly
   }
 };
 
@@ -501,10 +497,10 @@ function adminTotal() {
     .catch((error) => console.error("Error:", error));
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  getUserData();
+document.addEventListener("DOMContentLoaded", async function () {
+  const username_check = await getUserData();
 
-  if (localStorage.username === "admin") {
+  if (username_check === "admin") {
     // Function to create a button
     function createButton(id, text) {
       var button = document.createElement("button");
@@ -539,7 +535,6 @@ document.addEventListener("DOMContentLoaded", function () {
       getUserData();
     });
     adminMenu.appendChild(button2);
-
   }
 });
 
