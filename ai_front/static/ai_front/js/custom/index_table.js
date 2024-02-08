@@ -310,7 +310,7 @@ function jsonToTable(jsonData, filename) {
   var header = document.createElement("thead");
   var headerRow = document.createElement("tr");
   for (var key in jsonData[0]) {
-    if (key !== "사업자번호") {
+    if (key !== "사업자번호" && !key.includes("과금")) {
       var th = document.createElement("th");
       th.textContent = key;
 
@@ -330,7 +330,7 @@ function jsonToTable(jsonData, filename) {
   for (var i = 0; i < jsonData.length; i++) {
     var row = document.createElement("tr");
     for (var key in jsonData[i]) {
-      if (key !== "사업자번호") {
+      if (key !== "사업자번호" && !key.includes("과금")) {
         var cell = document.createElement("td");
         // Format the number with commas if it's a digit
         var cellContent = jsonData[i][key];
@@ -385,15 +385,18 @@ function jsonToTable(jsonData, filename) {
   if (filename.includes("baedal")) {
     var pay_first = getKeysWithTerm(jsonData[0], "과금1차");
     var pay_second = getKeysWithTerm(jsonData[0], "과금2차");
-    var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
+    // var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
+    var sumColumns = ["건수", "총합계"];
   } else if (filename.includes("coupang")) {
     var pay_copang = getKeysWithTerm(jsonData[0], "과금");
-    var sumColumns = ["건수", "총합계", `${pay_copang}`];
+    // var sumColumns = ["건수", "총합계", `${pay_copang}`];
+    var sumColumns = ["건수", "총합계"];
   }
   for (var i = 0; i < sumColumns.length; i++) {
     var sumCell = document.createElement("td");
     //쿠팡 총합계 표시 안함
-    if (filename.includes("coupang") && sumColumns[i] == "총합계") {
+    // if (filename.includes("coupang") && sumColumns[i] == "총합계") {
+      if (filename.includes("coupang") && sumColumns[i] == "총합계ㄴ") {
       sumCell.textContent = "";
     } else {
       temp_text = String(
