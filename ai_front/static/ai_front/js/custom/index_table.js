@@ -1,5 +1,11 @@
 const getUserData = async () => {
   try {
+    // Get the current URL
+    var currentUrl = window.location.href;
+
+    // Log or use the URL as needed
+    console.log("Current URL:", currentUrl);
+
     const accessToken = localStorage.getItem("access");
     const response = await fetch(`/users/`, {
       method: "GET",
@@ -15,8 +21,12 @@ const getUserData = async () => {
     localStorage.setItem("cust_nm", userData.cust_nm);
     localStorage.setItem("biz_no", userData.biz_no);
 
-    document.getElementById("username").textContent = `${userData.biz_owner}님 (${userData.username})`;
-    document.getElementById("userinfo").textContent = `${userData.cust_nm} [${userData.biz_no}]`;
+    document.getElementById(
+      "username"
+    ).textContent = `${userData.biz_owner}님 (${userData.username})`;
+    document.getElementById(
+      "userinfo"
+    ).textContent = `${userData.cust_nm} [${userData.biz_no}]`;
 
     if (userData.username === "admin") {
       adminStart();
@@ -42,12 +52,23 @@ function adminStart() {
   document.getElementById("card1_name").textContent = "어드민";
   document.getElementById("userinfo").textContent = "ADMIN";
   document.getElementById("username").textContent = "어드민";
+  console.log(localStorage.adminBtn);
+  console.log(localStorage.adminBtn);
+  console.log(localStorage.adminBtn);
 
-  url = "/api/AdminData/";
+  if (
+    localStorage.adminBtn === "세부내역" ||
+    localStorage.adminBtn === undefined
+  ) {
+    url = "/api/AdminData/";
+  } else if (localStorage.adminBtn === "세부내역2") {
+    url = "/api/AdminData0/";
+  }
   const data = {
     token: localStorage.getItem("access"),
     username: localStorage.getItem("username"),
   };
+  console.log(url);
 
   fetch(url, {
     method: "POST",
@@ -64,8 +85,8 @@ function adminStart() {
 }
 
 function adminData(data, url) {
-  console.log(data);
-  console.log(url);
+  // console.log(data);
+  // console.log(url);
 
   //container
   var containerDiv = document.createElement("div");
@@ -80,7 +101,6 @@ function adminData(data, url) {
   var table = document.createElement("table");
   table.classList.add(
     "table",
-    "table-striped",
     "table-bordered",
     "table-hover",
     "jsonData2",
@@ -95,13 +115,6 @@ function adminData(data, url) {
     th.textContent = key;
     headerRow.appendChild(th);
   });
-
-  // Add a button in the last th
-  if (url.includes("AdminData")) {
-    var buttonTh = document.createElement("th");
-    buttonTh.textContent = "Button";
-    headerRow.appendChild(buttonTh);
-  }
   thead.appendChild(headerRow);
   table.appendChild(thead);
 
@@ -109,30 +122,178 @@ function adminData(data, url) {
   var tbody = document.createElement("tbody");
   data.forEach((item, rowIndex) => {
     var row = document.createElement("tr");
-    var isFirstTd = true;
 
     Object.entries(item).forEach(([key, value], colIndex) => {
       var td = document.createElement("td");
+      // console.log(key)
 
       // Check if it's the first td and create an input box
-      if (isFirstTd) {
-        var input = document.createElement("input");
-        input.classList.add("form-control", "form-control-sm"); // Bootstrap class for styling
-        input.type = "text";
-        input.value = value === null ? "null" : value;
-        input.id = `row_${rowIndex}_${colIndex}`;
-        td.appendChild(input);
-        isFirstTd = false;
+      if (
+        key === "remark" &&
+        (localStorage.adminBtn === "세부내역" ||
+          localStorage.adminBtn === undefined)
+      ) {
+        var select = document.createElement("select");
+        select.classList.add(
+          "form-select",
+          "form-select-sm",
+          "btn-outline-secondary",
+          "w-auto"
+        );
+        select.id = `row_${rowIndex}_${colIndex}`;
+
+        //ABC
+        var options = [" ", "체크", "폐점", "양도", "양수"];
+        for (var i = 0; i < options.length; i++) {
+          var option = document.createElement("option");
+          option.value = options[i];
+          option.text = options[i];
+          select.appendChild(option);
+        }
+
+        // Set the selected option based on the current value
+        if (value !== null) {
+          temp_save_remark_value = value;
+          select.value = temp_save_remark_value;
+          if (temp_save_remark_value === "체크") {
+            row.classList.add("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+            row.classList.remove("table-dark");
+          } else if (temp_save_remark_value === "폐점") {
+            row.classList.add("table-dark");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+          } else if (
+            temp_save_remark_value === "양도" ||
+            temp_save_remark_value === "양수"
+          ) {
+            row.classList.add("table-primary");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-dark");
+          } else {
+            row.classList.remove("table-dark");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+          }
+        }
+
+        // Add change event listener
+        select.addEventListener("change", function () {
+          var selectedValue = select.value;
+          if (selectedValue === "체크") {
+            row.classList.add("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+            row.classList.remove("table-dark");
+          } else if (selectedValue === "폐점") {
+            row.classList.add("table-dark");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+          } else if (selectedValue === "양도" || selectedValue === "양수") {
+            row.classList.add("table-primary");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-dark");
+          } else {
+            row.classList.remove("table-dark");
+            row.classList.remove("table-success");
+            row.classList.remove("table-danger");
+            row.classList.remove("table-primary");
+          }
+
+          console.log(`row_${rowIndex}_1`);
+          change_calendar = document.getElementById(`row_${rowIndex}_1`);
+          if (selectedValue == "양도" || selectedValue == "양수") {
+            change_calendar.style.display = "block";
+          } else {
+            change_calendar.style.display = "none";
+          }
+          remarkSave(rowIndex, selectedValue);
+        });
+
+        td.appendChild(select);
+      } else if (
+        key === "calendar" &&
+        (localStorage.adminBtn === "세부내역" ||
+          localStorage.adminBtn === undefined)
+      ) {
+        //calendar
+        const inputElement = document.createElement("input");
+        inputElement.id = `row_${rowIndex}_${colIndex}`;
+        inputElement.textContent = value === null ? "null" : value;
+        inputElement.classList.add(
+          "form-control",
+          "form-control-sm",
+          "datepicker-input"
+        );
+        if (
+          temp_save_remark_value != "양도" &&
+          temp_save_remark_value != "양수"
+        ) {
+          inputElement.style.display = "none";
+        }
+        if (value !== null) {
+          inputElement.value = value;
+        }
+        td.appendChild(inputElement);
+        // Initialize the datepicker after appending the input to the DOM
+        $(inputElement).datepicker({
+          format: "yyyy-mm-dd",
+          autoclose: true,
+          language: "ko",
+          clearBtn: true,
+          todayHighlight: true,
+        });
+
+        // Add event listener for the date change
+        $(document).on("changeDate", `#${inputElement.id}`, function (e) {
+          var selectedDate = e.format("yyyy-mm-dd");
+          remarkSave(rowIndex, selectedDate);
+        });
       } else {
         // If value is null, add a class for yellow background
-        if (value === null) {
-          td.classList.add("bg-warning");
+        if (
+          (value === null || value === "숨김") &&
+          temp_save_remark_value !== "양도" &&
+          temp_save_remark_value !== "양수" &&
+          temp_save_remark_value !== "폐점" &&
+          temp_save_remark_value !== "체크"
+        ) {
+          row.classList.add("table-danger");
         }
         td.id = `row_${rowIndex}_${colIndex}`;
-        td.textContent = value === null ? "null" : value;
+
+        if (
+          key === "금액" ||
+          key === "쿠폰건수" ||
+          key === "합계" ||
+          key === "총건수" ||
+          key === "총금액" ||
+          key === "건수" ||
+          key === "총합계"
+        ) {
+          td.textContent =
+            value === null
+              ? "null"
+              : value === "-"
+              ? "-"
+              : Number(value).toLocaleString();
+          td.style.textAlign = "right";
+        } else {
+          td.textContent = value === null ? "null" : value;
+        }
 
         // Check if it's the second column (index 1) and create a hyperlink
-        if (colIndex === 1) {
+        if (
+          key === "사업자번호" &&
+          (localStorage.adminBtn === "세부내역" ||
+            localStorage.adminBtn === undefined)
+        ) {
           var link = document.createElement("a");
           link.setAttribute("onclick", `othersStart(${value})`);
           link.textContent = value;
@@ -145,17 +306,6 @@ function adminData(data, url) {
 
       row.appendChild(td);
     });
-    if (url.includes("AdminData")) {
-      // Add a button in the last td
-      var buttonTd = document.createElement("td");
-      var button = document.createElement("button");
-      button.classList.add("btn", "btn-primary", "btn-sm");
-      button.id = `button_${rowIndex}`; // Unique ID for the button
-      button.setAttribute("onclick", `remarkSave('row_${rowIndex}_')`); // Set onclick attribute
-      button.textContent = "Save";
-      buttonTd.appendChild(button);
-      row.appendChild(buttonTd);
-    }
     tbody.appendChild(row);
   });
   table.appendChild(tbody);
@@ -196,8 +346,8 @@ function othersStart(biz_no) {
       const dataFromUrl2 = results[1];
 
       // Do something with the JSON data from both URLs
-      console.log("baedal:", dataFromUrl1);
-      console.log("coupang:", dataFromUrl2);
+      // console.log("baedal:", dataFromUrl1);
+      // console.log("coupang:", dataFromUrl2);
 
       //container
       var containerDiv = document.createElement("div");
@@ -216,7 +366,7 @@ function othersStart(biz_no) {
       }
       if (dataFromUrl2 != undefined) {
         jsonToTable(dataFromUrl2, "coupang");
-      } 
+      }
       if (dataFromUrl1 == undefined && dataFromUrl2 == undefined) {
         tableContainerDiv.textContent = "이벤트 내역이 없습니다.";
       }
@@ -243,18 +393,10 @@ function fetchData(url) {
     });
 }
 
-function remarkSave(rowIndex) {
-  // Log information from localStorage
-  console.log(localStorage.username);
-  console.log(localStorage.access);
-
+function remarkSave(rowIndex, selectedValue) {
   // Get data from the HTML elements
-  const rawNo = document.getElementById(rowIndex + "1").textContent;
-  const remarkText = document.getElementById(rowIndex + "0").value;
-
-  // Log data from the HTML elements
-  console.log(rawNo);
-  console.log(remarkText);
+  const rawNo = document.getElementById(`row_${rowIndex}_` + "3").textContent;
+  const armNo = document.getElementById(`row_${rowIndex}_` + "4").textContent;
 
   // Make an API call
   fetch("/api/SaveRemark/", {
@@ -266,13 +408,15 @@ function remarkSave(rowIndex) {
       token: localStorage.access, // Pass the access token as "token"
       username: localStorage.username,
       rawNo: rawNo,
-      remarkText: remarkText,
+      armNo: armNo,
+      remarkText: selectedValue,
     }),
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.res == "saved") {
-        window.location.reload();
+        // window.location.reload();
+        console.log("saved");
       }
       // Handle the response data as needed
     })
@@ -310,7 +454,8 @@ function jsonToTable(jsonData, filename) {
   var header = document.createElement("thead");
   var headerRow = document.createElement("tr");
   for (var key in jsonData[0]) {
-    if (key !== "사업자번호" && !key.includes("과금")) {
+    // if (key !== "사업자번호" && !key.includes("과금")) {
+    if (key !== "사업자번호") {
       var th = document.createElement("th");
       th.textContent = key;
 
@@ -330,7 +475,8 @@ function jsonToTable(jsonData, filename) {
   for (var i = 0; i < jsonData.length; i++) {
     var row = document.createElement("tr");
     for (var key in jsonData[i]) {
-      if (key !== "사업자번호" && !key.includes("과금")) {
+      // if (key !== "사업자번호" && !key.includes("과금")) {
+      if (key !== "사업자번호") {
         var cell = document.createElement("td");
         // Format the number with commas if it's a digit
         var cellContent = jsonData[i][key];
@@ -346,6 +492,9 @@ function jsonToTable(jsonData, filename) {
           }
         } else if (!isNaN(cellContent)) {
           cellContent = formatNumberWithCommas(cellContent);
+          cell.style.textAlign = "right";
+        }
+        if (key == "쿠폰" || key == "분담금") {
           cell.style.textAlign = "right";
         }
 
@@ -385,18 +534,22 @@ function jsonToTable(jsonData, filename) {
   if (filename.includes("baedal")) {
     var pay_first = getKeysWithTerm(jsonData[0], "과금1차");
     var pay_second = getKeysWithTerm(jsonData[0], "과금2차");
-    // var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
-    var sumColumns = ["건수", "총합계"];
+
+    var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
+    // var sumColumns = ["건수", "총합계"];
   } else if (filename.includes("coupang")) {
     var pay_copang = getKeysWithTerm(jsonData[0], "과금");
-    // var sumColumns = ["건수", "총합계", `${pay_copang}`];
-    var sumColumns = ["건수", "총합계"];
+
+    var sumColumns = ["건수", "총합계", `${pay_copang}`];
+    // var sumColumns = ["건수", "총합계"];
   }
   for (var i = 0; i < sumColumns.length; i++) {
     var sumCell = document.createElement("td");
     //쿠팡 총합계 표시 안함
-    // if (filename.includes("coupang") && sumColumns[i] == "총합계") {
-      if (filename.includes("coupang") && sumColumns[i] == "총합계ㄴ") {
+
+    if (filename.includes("coupang") && sumColumns[i] == "총합계") {
+      // if (filename.includes("coupang") && sumColumns[i] == "총합계ㄴ") {
+
       sumCell.textContent = "";
     } else {
       temp_text = String(
@@ -479,7 +632,7 @@ function formatNumberWithCommas(number) {
 }
 
 function adminTotal() {
-  console.log("admin total");
+  // console.log("admin total");
   url = "/api/AdminTotal/";
   const data = {
     token: localStorage.getItem("access"),
@@ -519,6 +672,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     var button1 = createButton("admin_btn1", "총금액");
     button1.addEventListener("click", function () {
+      localStorage.setItem("adminBtn", "총금액");
       // Handle click for 총금액 button
       const body = document.getElementById("prom_table");
       while (body.firstChild) {
@@ -530,6 +684,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     var button2 = createButton("admin_btn2", "세부내역");
     button2.addEventListener("click", function () {
+      localStorage.setItem("adminBtn", "세부내역");
       // Handle click for 세부내역 button
       const body = document.getElementById("prom_table");
       while (body.firstChild) {
@@ -538,18 +693,32 @@ document.addEventListener("DOMContentLoaded", async function () {
       getUserData();
     });
     adminMenu.appendChild(button2);
+
+    var button3 = createButton("admin_btn3", "세부내역2");
+    button3.addEventListener("click", function () {
+      localStorage.setItem("adminBtn", "세부내역2");
+      // Handle click for 세부내역2 button
+      const body = document.getElementById("prom_table");
+      while (body.firstChild) {
+        body.removeChild(body.firstChild);
+      }
+      getUserData();
+    });
+    adminMenu.appendChild(button3);
   }
 });
 
-
 //비밀번호 변경
 function changePassword() {
+  admincheck = localStorage.username;
 
-  admincheck = localStorage.username
-
-  floatingInputPassword = document.getElementById("floatingInputPassword").value;
-  floatingInputNewPassword = document.getElementById("floatingInputNewPassword").value;
-  floatingInputNewPasswordConfirm = document.getElementById("floatingInputNewPasswordConfirm").value;
+  floatingInputPassword = document.getElementById("floatingInputPassword")
+    .value;
+  floatingInputNewPassword = document.getElementById("floatingInputNewPassword")
+    .value;
+  floatingInputNewPasswordConfirm = document.getElementById(
+    "floatingInputNewPasswordConfirm"
+  ).value;
   if (admincheck == "admin") {
     // alert("어드민 계정은 비밀번호 수정이 불가합니다.")
     Swal.fire({
@@ -558,7 +727,11 @@ function changePassword() {
       icon: "warning",
       confirmButtonText: "확인",
     });
-  } else if (floatingInputNewPassword == "" || floatingInputNewPasswordConfirm == "" || floatingInputPassword == "") {
+  } else if (
+    floatingInputNewPassword == "" ||
+    floatingInputNewPasswordConfirm == "" ||
+    floatingInputPassword == ""
+  ) {
     // alert("입력을 확인하세요.")
     Swal.fire({
       // title: '패스워드!',
@@ -575,7 +748,7 @@ function changePassword() {
       confirmButtonText: "확인",
     });
     document.getElementById("floatingInputNewPasswordConfirm").focus();
-  }  else if (floatingInputNewPassword!== floatingInputNewPasswordConfirm) {
+  } else if (floatingInputNewPassword !== floatingInputNewPasswordConfirm) {
     // alert("변경 할 비밀번호가 일치하지 않습니다.")
     Swal.fire({
       // title: '패스워드!',
@@ -584,7 +757,7 @@ function changePassword() {
       confirmButtonText: "확인",
     });
     document.getElementById("floatingInputNewPasswordConfirm").focus();
-  } else if (floatingInputPassword== floatingInputNewPassword) {
+  } else if (floatingInputPassword == floatingInputNewPassword) {
     // alert("동일한 비밀번호로 변경 할 수 없습니다.")
     Swal.fire({
       // title: '패스워드!',
@@ -625,20 +798,20 @@ function changePassword() {
             confirmButtonText: "확인",
           }).then((result) => {
             if (result.isConfirmed) {
-          handleLogout();
+              handleLogout();
             }
           });
         } else {
           // alert("현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.");
           Swal.fire({
             // title: '패스워드!',
-            text:  `현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.`,
+            text: `현재 비밀번호를 확인하세요.\n존재하지 않는 정보입니다.`,
             icon: "warning",
             confirmButtonText: "확인",
           });
           document.getElementById("floatingInputPassword").focus();
         }
-        console.log(data.message);
+        // console.log(data.message);
       })
       .catch((error) => console.error("Error:", error));
   }

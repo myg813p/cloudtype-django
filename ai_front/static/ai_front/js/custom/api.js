@@ -223,6 +223,7 @@ async function handleLogout() {
   localStorage.removeItem("biz_owner");
   localStorage.removeItem("cust_nm");
   localStorage.removeItem("biz_no");
+  localStorage.removeItem("adminBtn");
   // alert("로그아웃되었습니다.")
   location.reload();
 }

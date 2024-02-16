@@ -7,7 +7,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('id', 'username', 'biz_owner', 'biz_no', 'cust_nm', 'cust_id', 'biz_email')
     list_display_links = ('username', )
     list_filter = ('username', )
-    search_fields = ('username', 'email', )
+    search_fields = ('id', 'username', 'biz_owner', 'biz_no', 'cust_nm', 'cust_id', 'biz_email')
 
     fieldsets = (
         ("info", {'fields': ('username', 'biz_owner', 'biz_no', 'cust_nm', 'cust_id', 'biz_email', 'join_date',)}),

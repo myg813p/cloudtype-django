@@ -13,6 +13,7 @@ class SaveRemark(TokenVerifyView):
 
         def save_remark():
             rawNo = request.data['rawNo']
+            armNo = request.data['armNo']
             new_remark = request.data['remarkText']
 
             # Usage example
@@ -26,13 +27,16 @@ class SaveRemark(TokenVerifyView):
 
             destination_engine = create_engine(f"mysql+mysqlconnector://{destination_db_params['user']}:{destination_db_params['password']}@{destination_db_params['host']}:{destination_db_params['port']}/{destination_db_params['database']}")
 
-            query = text("UPDATE admin_sep SET remark = :new_remark WHERE 사업자번호 = :rawNo")
+            if '-' not in new_remark and new_remark != '':
+                query = text("UPDATE admin_sep SET remark = :new_remark WHERE 사업자번호 = :rawNo and 아름넷코드 = :armNo")
+            else:
+                query = text("UPDATE admin_sep SET calendar = :new_remark WHERE 사업자번호 = :rawNo and 아름넷코드 = :armNo")
             # print(f"Generated SQL Query: {query}")
             # print(f"new_remark: {new_remark}, rawNo: {rawNo}")
 
             try:
                 with destination_engine.connect() as connection:
-                    connection.execute(query, {'new_remark': new_remark, 'rawNo': rawNo})
+                    connection.execute(query, {'new_remark': new_remark, 'rawNo': rawNo, 'armNo': armNo})
                     connection.commit()
             except Exception as e:
                 print(f"Error: {e}")
@@ -61,6 +65,47 @@ class AdminData(TokenVerifyView):
             destination_engine = create_engine(f"mysql+mysqlconnector://{destination_db_params['user']}:{destination_db_params['password']}@{destination_db_params['host']}:{destination_db_params['port']}/{destination_db_params['database']}")
 
             query = text("SELECT * FROM admin_sep")
+
+            try:
+                with destination_engine.connect() as connection:
+                    result = connection.execute(query)
+                    rows = result.fetchall()
+
+                    if not rows:
+                        print("No rows returned from the database")
+                        return None
+
+                    # Convert the result to a list of dictionaries
+                    data = [dict(zip(result.keys(), row)) for row in rows]
+                    return data
+            except Exception as e:
+                print(f"Error: {e}")
+                return None
+
+        # Check the status code of the verification response
+        if response.status_code == status.HTTP_200_OK and request.data['username'] == "admin":
+            data = admin_data()
+            return Response({"adminData": data}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Token is invalid or expired"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class AdminData0(TokenVerifyView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        def admin_data():
+            # Usage example
+            destination_db_params = {
+                'user': 'root',
+                'password': '#dpg85kjp',
+                'host': 'svc.sel5.cloudtype.app',
+                'port': '32691',
+                'database': 'kiyoung',
+            }
+
+            destination_engine = create_engine(f"mysql+mysqlconnector://{destination_db_params['user']}:{destination_db_params['password']}@{destination_db_params['host']}:{destination_db_params['port']}/{destination_db_params['database']}")
+
+            query = text("SELECT * FROM admin_sep0")
 
             try:
                 with destination_engine.connect() as connection:
