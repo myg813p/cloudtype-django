@@ -6,7 +6,35 @@
     border: none; /* Use 'border' property to remove borders */
 }
 
-.jsonData2 td {
+.jsonData3 th {
+    background-color: #c70505; /* Dark color for header */
+    color: white; /* Text color for header */
+    font-size: 13px; /* Font size for header */
+    border: none; /* Use 'border' property to remove borders */
+}
+
+
+.jsonData4 th {
+    background-color: #000000; /* Dark color for header */
+    color: white; /* Text color for header */
+    font-size: 12px; /* Font size for header */
+    border: ''; /* Use 'border' property to remove borders */
+}
+
+
+.jsonData2 td,
+.jsonData3 td {
     font-size: 12px; /* Font size for data cells */
     border: none; /* Use 'border' property to remove borders */
+}
+
+.jsonData4 td {
+    font-size: 12px; /* Font size for data cells */
+}
+
+/* Add this CSS to your stylesheet */
+.table th,
+.table td {
+  min-width: 100px; /* Adjust the minimum width as needed */
+  white-space: nowrap;
 }

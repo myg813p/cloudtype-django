@@ -341,15 +341,47 @@
               <div class="col-12">
                 <div class="card shadow mb-4">
                   <!-- Card Header - Dropdown -->
-                  <div
-                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
-                  >
+                  <div id="sub-header" class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6
                       id="card1_name"
                       class="m-0 font-weight-bold text-primary"
                     >
                       card1_name
                     </h6>
+                    <div class="d-flex justify-content-between" id="month_select">
+                      <button id="reloadBtn" class="btn btn-secondary btn-sm mr-1" type="button" onclick="reloadPage()">↻</button>
+                      <div id="month_select_prom" class="mr-1">
+                        <!-- Bootstrap Dropdown -->
+                        <div class="dropdown">
+                          <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="monthDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            판촉내역
+                          </button>
+                          <div id="month_select_prom_dropdown" class="dropdown-menu" aria-labelledby="monthDropdown">
+                            <!-- Dropdown items -->
+                            {% comment %} <a class="dropdown-item" href="#">January</a>
+                            <a class="dropdown-item" href="#">February</a>
+                            <a class="dropdown-item" href="#">March</a> {% endcomment %}
+                            <!-- Add more months as needed -->
+                          </div>
+                        </div>
+                      </div>
+                      <div id="month_select_ads">
+                        <!-- Bootstrap Dropdown -->
+                        <div class="dropdown">
+                          <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="monthDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            광고내역
+                          </button>
+                          <div id="month_select_ads_dropdown" class="dropdown-menu" aria-labelledby="monthDropdown">
+                            <!-- Dropdown items -->
+                            {% comment %} <a class="dropdown-item" href="#">January</a>
+                            <a class="dropdown-item" href="#">February</a>
+                            <a class="dropdown-item" href="#">March</a> {% endcomment %}
+                            <!-- Add more months as needed -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--
                     <div class="dropdown no-arrow">
                       <a
                         class="dropdown-toggle"
@@ -380,6 +412,7 @@
                         {% endcomment %}
                       </div>
                     </div>
+                    -->
                   </div>
                   <!-- Card Body -->
                   <div id="prom_table" class="card-body"></div>
@@ -855,9 +888,41 @@
         class="modal-dialog modal-dialog-centered"
         style="max-width: 80%; margin: auto"
       >
-        <div class="modal-content">
-          <div class="modal-header d-flex">
+        <div class="modal-content" style="overflow-y: auto;">
+          <div id="pop-sub-header" class="modal-header d-flex">
             <h5 class="modal-title" id="modal_store_name"></h5>
+                    {% comment %} <div class="d-flex justify-content-between" id="month_select">
+                      <div id="month_select_prom" class="mr-1">
+                        <!-- Bootstrap Dropdown -->
+                        <div class="dropdown">
+                          <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="monthDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            판촉내역
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="monthDropdown">
+                            <!-- Dropdown items -->
+                            <a class="dropdown-item" href="#">January</a>
+                            <a class="dropdown-item" href="#">February</a>
+                            <a class="dropdown-item" href="#">March</a>
+                            <!-- Add more months as needed -->
+                          </div>
+                        </div>
+                      </div>
+                      <div id="month_select_ads">
+                        <!-- Bootstrap Dropdown -->
+                        <div class="dropdown">
+                          <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="monthDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            광고내역
+                          </button>
+                          <div class="dropdown-menu" aria-labelledby="monthDropdown">
+                            <!-- Dropdown items -->
+                            <a class="dropdown-item" href="#">January</a>
+                            <a class="dropdown-item" href="#">February</a>
+                            <a class="dropdown-item" href="#">March</a>
+                            <!-- Add more months as needed -->
+                          </div>
+                        </div>
+                      </div>
+                    </div> {% endcomment %}
             {% comment %} <button
               type="button"
               class="btn-close"

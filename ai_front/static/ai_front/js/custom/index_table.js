@@ -1,3 +1,27 @@
+function showDate() {
+  //Calculate DATE
+  //Calculate DATE
+  //Calculate DATE
+  //Calculate DATE
+  //Calculate DATE
+  //Calculate DATE
+  let text = "2024-02";
+  let startDate = new Date(text);
+  let endDate = new Date("2024-01");
+  let monthsList = [];
+
+  while (startDate >= endDate) {
+    let month = startDate.getMonth() + 1; // Adding 1 because months are zero-based
+    let formattedMonth = month < 10 ? `0${month}` : `${month}`;
+    let year = startDate.getFullYear();
+    monthsList.push(`${year}-${formattedMonth}`);
+    startDate.setMonth(startDate.getMonth() - 1);
+  }
+  // console.log(monthsList);
+
+  return monthsList;
+}
+
 const getUserData = async () => {
   try {
     // Get the current URL
@@ -28,10 +52,67 @@ const getUserData = async () => {
       "userinfo"
     ).textContent = `${userData.cust_nm} [${userData.biz_no}]`;
 
+    //어드민, 유저 공통
+    //판촉내역, 광고내역
+    monthsList = showDate();
+    // Get the dropdown container element
+    var dropdownContainer_prom = document.getElementById(
+      "month_select_prom_dropdown"
+    );
+    var dropdownContainer_ads = document.getElementById(
+      "month_select_ads_dropdown"
+    );
+
+    //del children
+    var div = document.getElementById("month_select_prom_dropdown");
+    while (div.firstChild) {
+      div.removeChild(div.firstChild);
+    }
+
+    for (var i = 0; i < monthsList.length; i++) {
+      // Create a new monthItem for prom dropdown
+      var monthItem_prom = document.createElement("a");
+      monthItem_prom.setAttribute("class", "dropdown-item");
+      monthItem_prom.setAttribute("href", "#");
+      if (userData.username === "admin") {
+        monthItem_prom.setAttribute(
+          "onclick",
+          `adminStart('${monthsList[i]}')`
+        );
+      } else if (userData.username !== "admin") {
+        monthItem_prom.setAttribute(
+          "onclick",
+          `othersStart('${userData.biz_no}', ['${monthsList[i]}selected_prom'])`
+        );
+      }
+      monthItem_prom.textContent = monthsList[i];
+
+      // Append the created item to the prom dropdown container
+      dropdownContainer_prom.appendChild(monthItem_prom);
+
+      // Create a new monthItem for ads dropdown
+      var monthItem_ads = document.createElement("a");
+      monthItem_ads.setAttribute("class", "dropdown-item");
+      monthItem_ads.setAttribute("href", "#");
+      monthItem_ads.setAttribute(
+        "onclick",
+        `othersStart('${userData.biz_no}', ['${monthsList[i]}selected_ads'])`
+      );
+      monthItem_ads.textContent = monthsList[i];
+
+      // Append the created item to the ads dropdown container
+      if (i > 0) {
+        dropdownContainer_ads.appendChild(monthItem_ads);
+      }
+    }
+
     if (userData.username === "admin") {
-      adminStart();
+      monthLists = showDate();
+      selectedDate = monthLists[0];
+      console.log(selectedDate);
+      adminStart(selectedDate);
     } else {
-      othersStart(userData.biz_no);
+      othersStart(userData.biz_no, monthsList);
     }
 
     return userData.username; // Return the username
@@ -47,14 +128,24 @@ const getUserData = async () => {
 //어드민
 //어드민
 //어드민
-function adminStart() {
+function adminStart(selectedDate) {
+  var card1_name = document.getElementById("card1_name");
+  page_name = localStorage.getItem("adminBtn");
+  if (!page_name) {
+    page_name = "세부내역";
+  }
+  card1_name.innerText = page_name + " (" + selectedDate + ")";
+
+  console.log(localStorage.getItem("adminBtn"));
+  // 광고내역 hidden
+  var dropdownContainer_ads = document.getElementById("month_select_ads");
+  dropdownContainer_ads.style.display = "none";
+
   //
   document.getElementById("card1_name").textContent = "어드민";
   document.getElementById("userinfo").textContent = "ADMIN";
   document.getElementById("username").textContent = "어드민";
-  console.log(localStorage.adminBtn);
-  console.log(localStorage.adminBtn);
-  console.log(localStorage.adminBtn);
+  // console.log(localStorage.adminBtn);
 
   if (
     localStorage.adminBtn === "세부내역" ||
@@ -63,12 +154,15 @@ function adminStart() {
     url = "/api/AdminData/";
   } else if (localStorage.adminBtn === "세부내역2") {
     url = "/api/AdminData0/";
+  } else {
+    url = "/api/AdminData/";
   }
   const data = {
     token: localStorage.getItem("access"),
     username: localStorage.getItem("username"),
+    selectedDate: selectedDate,
   };
-  console.log(url);
+  // console.log(url);
 
   fetch(url, {
     method: "POST",
@@ -79,239 +173,289 @@ function adminStart() {
   })
     .then((response) => response.json())
     .then((data) => {
-      adminData(data["adminData"], url);
+      adminData(data["adminData"], url, selectedDate);
     })
     .catch((error) => console.error("Error:", error));
 }
 
-function adminData(data, url) {
-  // console.log(data);
-  // console.log(url);
+function adminData(data, url, selectedDate) {
+  var card1_name = document.getElementById("card1_name");
+  page_name = localStorage.getItem("adminBtn");
+  if (!page_name) {
+    page_name = "세부내역";
+  }
+  card1_name.innerText = page_name + " (" + selectedDate + ")";
 
-  //container
-  var containerDiv = document.createElement("div");
-  containerDiv.className = "container mt-4";
-  var tableContainerDiv = document.createElement("div");
-  tableContainerDiv.id = "tableContainer";
-  tableContainerDiv.className = "table-responsive";
-  containerDiv.appendChild(tableContainerDiv);
-  var bodyElement = document.getElementById("prom_table");
-  bodyElement.appendChild(containerDiv);
+  // Remove all child elements
+  var parentElement = document.getElementById("prom_table");
+  while (parentElement.firstChild) {
+    parentElement.removeChild(parentElement.firstChild);
+  }
 
-  var table = document.createElement("table");
-  table.classList.add(
-    "table",
-    "table-bordered",
-    "table-hover",
-    "jsonData2",
-    "mt-4"
-  );
+  if (data) {
+    //container
+    var containerDiv = document.createElement("div");
+    containerDiv.className = "container mt-4";
+    var tableContainerDiv = document.createElement("div");
+    tableContainerDiv.id = "tableContainer";
+    containerDiv.appendChild(tableContainerDiv);
+    var bodyElement = document.getElementById("prom_table");
+    bodyElement.appendChild(containerDiv);
+    // Check if the screen width is below a certain threshold (e.g., 768px for typical mobile devices)
+    if (window.innerWidth <= 768) {
+      tableContainerDiv.className = "table-responsive";
+    }
 
-  // Create the table header
-  var thead = document.createElement("thead");
-  var headerRow = document.createElement("tr");
-  Object.keys(data[0]).forEach((key) => {
-    var th = document.createElement("th");
-    th.textContent = key;
-    headerRow.appendChild(th);
-  });
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
+    var table = document.createElement("table");
+    table.classList.add(
+      "table",
+      "table-bordered",
+      "table-hover",
+      "jsonData2",
+      "mt-4"
+    );
 
-  // Create the table body
-  var tbody = document.createElement("tbody");
-  data.forEach((item, rowIndex) => {
-    var row = document.createElement("tr");
+    // Create the table header
+    var thead = document.createElement("thead");
+    var headerRow = document.createElement("tr");
+    Object.keys(data[0]).forEach((key) => {
+      var th = document.createElement("th");
+      th.textContent = key;
 
-    Object.entries(item).forEach(([key, value], colIndex) => {
-      var td = document.createElement("td");
-      // console.log(key)
+      console.log(key);
 
-      // Check if it's the first td and create an input box
-      if (
-        key === "remark" &&
-        (localStorage.adminBtn === "세부내역" ||
-          localStorage.adminBtn === undefined)
-      ) {
-        var select = document.createElement("select");
-        select.classList.add(
-          "form-select",
-          "form-select-sm",
-          "btn-outline-secondary",
-          "w-auto"
-        );
-        select.id = `row_${rowIndex}_${colIndex}`;
+      if (key === "calendar") {
+        th.style.setProperty("min-width", "120px");
+      }
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-        //ABC
-        var options = [" ", "체크", "폐점", "양도", "양수"];
-        for (var i = 0; i < options.length; i++) {
-          var option = document.createElement("option");
-          option.value = options[i];
-          option.text = options[i];
-          select.appendChild(option);
-        }
+    // Create the table body
+    var tbody = document.createElement("tbody");
+    data.forEach((item, rowIndex) => {
+      var row = document.createElement("tr");
 
-        // Set the selected option based on the current value
-        if (value !== null) {
-          temp_save_remark_value = value;
-          select.value = temp_save_remark_value;
-          if (temp_save_remark_value === "체크") {
-            row.classList.add("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-            row.classList.remove("table-dark");
-          } else if (temp_save_remark_value === "폐점") {
-            row.classList.add("table-dark");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-          } else if (
-            temp_save_remark_value === "양도" ||
-            temp_save_remark_value === "양수"
-          ) {
-            row.classList.add("table-primary");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-dark");
-          } else {
-            row.classList.remove("table-dark");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-          }
-        }
+      Object.entries(item).forEach(([key, value], colIndex) => {
+        var td = document.createElement("td");
+        // console.log(key)
 
-        // Add change event listener
-        select.addEventListener("change", function () {
-          var selectedValue = select.value;
-          if (selectedValue === "체크") {
-            row.classList.add("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-            row.classList.remove("table-dark");
-          } else if (selectedValue === "폐점") {
-            row.classList.add("table-dark");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-          } else if (selectedValue === "양도" || selectedValue === "양수") {
-            row.classList.add("table-primary");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-dark");
-          } else {
-            row.classList.remove("table-dark");
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
-            row.classList.remove("table-primary");
-          }
-
-          console.log(`row_${rowIndex}_1`);
-          change_calendar = document.getElementById(`row_${rowIndex}_1`);
-          if (selectedValue == "양도" || selectedValue == "양수") {
-            change_calendar.style.display = "block";
-          } else {
-            change_calendar.style.display = "none";
-          }
-          remarkSave(rowIndex, selectedValue);
-        });
-
-        td.appendChild(select);
-      } else if (
-        key === "calendar" &&
-        (localStorage.adminBtn === "세부내역" ||
-          localStorage.adminBtn === undefined)
-      ) {
-        //calendar
-        const inputElement = document.createElement("input");
-        inputElement.id = `row_${rowIndex}_${colIndex}`;
-        inputElement.textContent = value === null ? "null" : value;
-        inputElement.classList.add(
-          "form-control",
-          "form-control-sm",
-          "datepicker-input"
-        );
+        // Check if it's the first td and create an input box
         if (
-          temp_save_remark_value != "양도" &&
-          temp_save_remark_value != "양수"
-        ) {
-          inputElement.style.display = "none";
-        }
-        if (value !== null) {
-          inputElement.value = value;
-        }
-        td.appendChild(inputElement);
-        // Initialize the datepicker after appending the input to the DOM
-        $(inputElement).datepicker({
-          format: "yyyy-mm-dd",
-          autoclose: true,
-          language: "ko",
-          clearBtn: true,
-          todayHighlight: true,
-        });
-
-        // Add event listener for the date change
-        $(document).on("changeDate", `#${inputElement.id}`, function (e) {
-          var selectedDate = e.format("yyyy-mm-dd");
-          remarkSave(rowIndex, selectedDate);
-        });
-      } else {
-        // If value is null, add a class for yellow background
-        if (
-          (value === null || value === "숨김") &&
-          temp_save_remark_value !== "양도" &&
-          temp_save_remark_value !== "양수" &&
-          temp_save_remark_value !== "폐점" &&
-          temp_save_remark_value !== "체크"
-        ) {
-          row.classList.add("table-danger");
-        }
-        td.id = `row_${rowIndex}_${colIndex}`;
-
-        if (
-          key === "금액" ||
-          key === "쿠폰건수" ||
-          key === "합계" ||
-          key === "총건수" ||
-          key === "총금액" ||
-          key === "건수" ||
-          key === "총합계"
-        ) {
-          td.textContent =
-            value === null
-              ? "null"
-              : value === "-"
-              ? "-"
-              : Number(value).toLocaleString();
-          td.style.textAlign = "right";
-        } else {
-          td.textContent = value === null ? "null" : value;
-        }
-
-        // Check if it's the second column (index 1) and create a hyperlink
-        if (
-          key === "사업자번호" &&
+          key === "remark" &&
           (localStorage.adminBtn === "세부내역" ||
             localStorage.adminBtn === undefined)
         ) {
-          var link = document.createElement("a");
-          link.setAttribute("onclick", `othersStart(${value})`);
-          link.textContent = value;
-          link.style.color = "blue";
-          link.style.cursor = "pointer";
-          td.innerHTML = ""; // Clear td content
-          td.appendChild(link);
+          var select = document.createElement("select");
+          select.classList.add(
+            "form-select",
+            "form-select-sm",
+            "btn-outline-secondary",
+            "w-auto"
+          );
+          select.id = `row_${rowIndex}_${colIndex}`;
+
+          //ABC
+          var options = [" ", "체크", "폐점", "양도양수"];
+          for (var i = 0; i < options.length; i++) {
+            var option = document.createElement("option");
+            option.value = options[i];
+            option.text = options[i];
+            select.appendChild(option);
+          }
+
+          // Set the selected option based on the current value
+          if (value !== null) {
+            temp_save_remark_value = value;
+            select.value = temp_save_remark_value;
+            if (temp_save_remark_value === "체크") {
+              row.classList.add("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+              row.classList.remove("table-dark");
+            } else if (temp_save_remark_value === "폐점") {
+              row.classList.add("table-dark");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+            } else if (temp_save_remark_value === "양도양수") {
+              row.classList.add("table-primary");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-dark");
+            } else {
+              row.classList.remove("table-dark");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+            }
+          }
+
+          // Add change event listener
+          select.addEventListener("change", function () {
+            var selectedValue = select.value;
+            if (selectedValue === "체크") {
+              row.classList.add("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+              row.classList.remove("table-dark");
+            } else if (selectedValue === "폐점") {
+              row.classList.add("table-dark");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+            } else if (selectedValue === "양도양수") {
+              row.classList.add("table-primary");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-dark");
+            } else {
+              row.classList.remove("table-dark");
+              row.classList.remove("table-success");
+              row.classList.remove("table-danger");
+              row.classList.remove("table-primary");
+            }
+
+            // console.log(`row_${rowIndex}_1`);
+            change_calendar = document.getElementById(`row_${rowIndex}_1`);
+            if (selectedValue == "양도양수") {
+              change_calendar.style.display = "block";
+            } else {
+              change_calendar.style.display = "none";
+            }
+            remarkSave(rowIndex, selectedValue);
+
+            btn_yang = document.getElementById(`row_${rowIndex}`);
+            if (selectedValue == "양도양수") {
+              if (!btn_yang) {
+                var parentElement = change_calendar.parentNode;
+                btn_yang = document.createElement("button");
+                btn_yang.id = `row_${rowIndex}`;
+                btn_yang.name = `btn_yang`;
+                btn_yang.textContent = "양도양수다운로드";
+                btn_yang.setAttribute(
+                  "onclick",
+                  `download_yang('row_${rowIndex}')`
+                );
+                btn_yang.classList.add("btn", "btn-sm", "btn-danger");
+                parentElement.appendChild(btn_yang);
+              }
+              btn_yang.style.display = "block";
+            } else {
+              btn_yang.style.display = "none";
+            }
+          });
+
+          td.appendChild(select);
+        } else if (
+          key === "calendar" &&
+          (localStorage.adminBtn === "세부내역" ||
+            localStorage.adminBtn === undefined)
+        ) {
+          //calendar
+          const inputElement = document.createElement("input");
+          inputElement.id = `row_${rowIndex}_${colIndex}`;
+          inputElement.textContent = value === null ? "null" : value;
+          inputElement.classList.add(
+            "form-control",
+            "form-control-sm",
+            "datepicker-input"
+          );
+          if (temp_save_remark_value != "양도양수") {
+            inputElement.style.display = "none";
+          } else {
+            btn_yang = document.createElement("button");
+            btn_yang.id = `row_${rowIndex}`;
+            btn_yang.name = `btn_yang`;
+            btn_yang.textContent = "양도양수다운로드";
+            btn_yang.setAttribute(
+              "onclick",
+              `download_yang('row_${rowIndex}')`
+            );
+            btn_yang.classList.add("btn", "btn-sm", "btn-primary");
+            td.appendChild(btn_yang);
+          }
+          if (value !== null) {
+            inputElement.value = value;
+          }
+          td.appendChild(inputElement);
+          // Initialize the datepicker after appending the input to the DOM
+          $(inputElement).datepicker({
+            format: "yyyy-mm-dd",
+            autoclose: true,
+            language: "ko",
+            clearBtn: true,
+            todayHighlight: true,
+          });
+
+          // Add event listener for the date change
+          $(document).on("changeDate", `#${inputElement.id}`, function (e) {
+            var selectedDate = e.format("yyyy-mm-dd");
+            remarkSave(rowIndex, selectedDate);
+          });
+        } else {
+          // If value is null, add a class for yellow background
+          if (
+            (value === null || value === "숨김") &&
+            temp_save_remark_value !== "양도양수" &&
+            temp_save_remark_value !== "폐점" &&
+            temp_save_remark_value !== "체크"
+          ) {
+            row.classList.add("table-danger");
+          }
+          td.id = `row_${rowIndex}_${colIndex}`;
+
+          if (
+            key === "금액" ||
+            key === "쿠폰건수" ||
+            key === "합계" ||
+            key === "총건수" ||
+            key === "총금액" ||
+            key === "건수" ||
+            key === "총합계"
+          ) {
+            td.textContent =
+              value === null
+                ? "null"
+                : value === "-"
+                ? "-"
+                : Number(value).toLocaleString();
+            td.style.textAlign = "right";
+          } else {
+            td.textContent = value === null ? "null" : value;
+          }
+
+          // Check if it's the second column (index 1) and create a hyperlink
+          if (
+            key === "사업자번호" &&
+            (localStorage.adminBtn === "세부내역" ||
+              localStorage.adminBtn === undefined)
+          ) {
+            var link = document.createElement("a");
+            monthsList = showDate();
+            // console.log(monthsList);
+            link.setAttribute(
+              "onclick",
+              `othersStart('${value}', ${JSON.stringify(monthsList)})`
+            );
+            link.textContent = value;
+            link.style.color = "blue";
+            link.style.cursor = "pointer";
+            td.innerHTML = ""; // Clear td content
+            td.appendChild(link);
+          }
         }
-      }
 
-      row.appendChild(td);
+        row.appendChild(td);
+      });
+      tbody.appendChild(row);
     });
-    tbody.appendChild(row);
-  });
-  table.appendChild(tbody);
+    table.appendChild(tbody);
 
-  // Append the table to the container
-  tableContainerDiv.appendChild(table);
+    // Append the table to the container
+    tableContainerDiv.appendChild(table);
+  }
 }
 
 //고객정보
@@ -319,7 +463,8 @@ function adminData(data, url) {
 //고객정보
 //고객정보
 //고객정보
-function othersStart(biz_no) {
+function othersStart(biz_no, monthsList) {
+  //어드민페이지
   if (localStorage.username === "admin") {
     const body = document.getElementById("modal_body_ea");
     while (body.firstChild) {
@@ -334,20 +479,53 @@ function othersStart(biz_no) {
     );
     myModal.show();
   }
+  //어드민 아니면 (점주), 페이지 지우기
+  else {
+    var promTable = document.getElementById("prom_table");
+    while (promTable.firstChild) {
+      promTable.removeChild(promTable.firstChild);
+    }
+  }
 
+  var url0 = `/static/ai_front/json_files/data_fee/cal_due_data.json`;
   var url1 = `/static/ai_front/json_files/data/${biz_no}_baedal.json`;
   var url2 = `/static/ai_front/json_files/data/${biz_no}_coupang.json`;
+  var url3 = `/static/ai_front/json_files/data_ads/ads.json`;
 
   // Use Promise.all to fetch data from both URLs concurrently
-  Promise.all([fetchData(url1), fetchData(url2)])
+  Promise.all([
+    fetchData(url0),
+    fetchData(url1),
+    fetchData(url2),
+    fetchData(url3),
+  ])
     .then((results) => {
       // results is an array containing the data from both URLs
-      const dataFromUrl1 = results[0];
-      const dataFromUrl2 = results[1];
+      const brandSum = [];
+      const dataFromUrl0 = results[0];
+      const dataFromUrl1 = results[1];
+      const dataFromUrl2 = results[2];
+      const dataFromUrl3 = results[3];
+
+      // 과금1차, 과금2차 기간 가져오기
+      find_fee_month = monthsList[0]
+        .replaceAll("-", "")
+        .replaceAll("selected_prom", "")
+        .replaceAll("selected_ads", "");
+      console.log(find_fee_month);
+      console.log(find_fee_month);
+      console.log(find_fee_month);
+      console.log(find_fee_month);
+
+      if (dataFromUrl0.hasOwnProperty(find_fee_month)) {
+        var fee_month = dataFromUrl0[find_fee_month];
+        console.log(fee_month);
+      }
 
       // Do something with the JSON data from both URLs
       // console.log("baedal:", dataFromUrl1);
       // console.log("coupang:", dataFromUrl2);
+      // console.log("ads:", dataFromUrl3)
 
       //container
       var containerDiv = document.createElement("div");
@@ -359,16 +537,55 @@ function othersStart(biz_no) {
       var bodyElement = document.getElementById("prom_table");
       bodyElement.appendChild(containerDiv);
 
-      //점주
-      document.getElementById("card1_name").textContent = "프로모션 과금 내역";
-      if (dataFromUrl1 != undefined) {
-        jsonToTable(dataFromUrl1, "baedal");
+      //점주 전체표시
+      document.getElementById("card1_name").textContent = "과금 내역";
+      if (!monthsList[0].includes("selected")) {
+        //날짜계산
+        jsonToTable_month = monthsList[0];
+        if (monthsList[1]) {
+          jsonToTableAds_month = monthsList[1];
+        } else {
+          jsonToTableAds_month = "9999-99";
+        }
+
+        if (dataFromUrl1 != undefined) {
+          //브랜드명 가져오기
+          brandSum.push(...new Set(dataFromUrl1.map((item) => item.브랜드)));
+          jsonToTable(dataFromUrl1, "baedal", jsonToTable_month, fee_month);
+        }
+        if (dataFromUrl2 != undefined) {
+          //브랜드명 가져오기
+          brandSum.push(...new Set(dataFromUrl2.map((item) => item.브랜드)));
+          jsonToTable(dataFromUrl2, "coupang", jsonToTable_month, fee_month);
+        }
+        if (dataFromUrl3 != undefined) {
+          brandCheck = [...new Set(brandSum)];
+          jsonToTableAds(dataFromUrl3, brandCheck, jsonToTableAds_month);
+        }
       }
-      if (dataFromUrl2 != undefined) {
-        jsonToTable(dataFromUrl2, "coupang");
+      //판촉내역 클릭
+      else if (monthsList[0].includes("selected_prom")) {
+        jsonToTable_month = monthsList[0].replaceAll("selected_prom", "");
+        if (dataFromUrl1 != undefined) {
+          //브랜드명 가져오기
+          brandSum.push(...new Set(dataFromUrl1.map((item) => item.브랜드)));
+          jsonToTable(dataFromUrl1, "baedal", jsonToTable_month, fee_month);
+        }
+        if (dataFromUrl2 != undefined) {
+          //브랜드명 가져오기
+          brandSum.push(...new Set(dataFromUrl2.map((item) => item.브랜드)));
+          jsonToTable(dataFromUrl2, "coupang", jsonToTable_month, fee_month);
+        }
       }
-      if (dataFromUrl1 == undefined && dataFromUrl2 == undefined) {
-        tableContainerDiv.textContent = "이벤트 내역이 없습니다.";
+      //광고내역 클릭
+      else if (monthsList[0].includes("selected_ads")) {
+        jsonToTableAds_month = monthsList[0].replaceAll("selected_ads", "");
+        if (dataFromUrl3 != undefined) {
+          brandSum.push(...new Set(dataFromUrl1.map((item) => item.브랜드)));
+          brandSum.push(...new Set(dataFromUrl2.map((item) => item.브랜드)));
+          brandCheck = [...new Set(brandSum)];
+          jsonToTableAds(dataFromUrl3, brandCheck, jsonToTableAds_month);
+        }
       }
     })
     .catch((error) => {
@@ -395,8 +612,13 @@ function fetchData(url) {
 
 function remarkSave(rowIndex, selectedValue) {
   // Get data from the HTML elements
-  const rawNo = document.getElementById(`row_${rowIndex}_` + "3").textContent;
-  const armNo = document.getElementById(`row_${rowIndex}_` + "4").textContent;
+  const remark = selectedValue; // 체크,폐점,양도양수,날짜
+  const calendar = document.getElementById(`row_${rowIndex}_` + "1")
+    .textContent;
+  const YM = document.getElementById(`row_${rowIndex}_` + "2").textContent;
+  const use_not = document.getElementById(`row_${rowIndex}_` + "3").textContent;
+  const rawNo = document.getElementById(`row_${rowIndex}_` + "4").textContent;
+  const armNo = document.getElementById(`row_${rowIndex}_` + "5").textContent;
 
   // Make an API call
   fetch("/api/SaveRemark/", {
@@ -409,7 +631,8 @@ function remarkSave(rowIndex, selectedValue) {
       username: localStorage.username,
       rawNo: rawNo,
       armNo: armNo,
-      remarkText: selectedValue,
+      YM: YM,
+      remarkText: remark,
     }),
   })
     .then((response) => response.json())
@@ -426,7 +649,7 @@ function remarkSave(rowIndex, selectedValue) {
     });
 }
 
-function jsonToTable(jsonData, filename) {
+function jsonToTable(jsonData, filename, jsonToTable_month, fee_month) {
   check_202311 = false;
 
   // Create and append the title element
@@ -462,6 +685,16 @@ function jsonToTable(jsonData, filename) {
       if (["년월", "브랜드", "행사"].includes(key)) {
         th.style.textAlign = "left";
       } else {
+        if (key.includes("과금")) {
+          pay_coupang = `과금${fee_month["first_month"]}`;
+          th.textContent = pay_coupang;
+        } else if (key.includes("과금1차")) {
+          pay_first = `과금1차${fee_month["first_month"]}`;
+          th.textContent = pay_first;
+        } else if (key.includes("과금2차")) {
+          pay_second = `과금2차${fee_month["second_month"]}`;
+          th.textContent = pay_second;
+        }
         th.style.textAlign = "right";
       }
       headerRow.appendChild(th);
@@ -474,48 +707,39 @@ function jsonToTable(jsonData, filename) {
   var tbody = document.createElement("tbody");
   for (var i = 0; i < jsonData.length; i++) {
     var row = document.createElement("tr");
-    for (var key in jsonData[i]) {
-      // if (key !== "사업자번호" && !key.includes("과금")) {
-      if (key !== "사업자번호") {
-        var cell = document.createElement("td");
-        // Format the number with commas if it's a digit
-        var cellContent = jsonData[i][key];
-        if (key == "년월") {
-          // Convert the number to a string
-          const dateString = cellContent.toString();
-          const year = dateString.slice(0, 4);
-          const month = dateString.slice(4, 6);
-          cellContent = `${year}-${month}`;
+    if (jsonData[i]["년월"] === jsonToTable_month.replaceAll("-", "")) {
+      for (var key in jsonData[i]) {
+        // if (key !== "사업자번호" && !key.includes("과금")) {
+        if (key !== "사업자번호") {
+          var cell = document.createElement("td");
+          // Format the number with commas if it's a digit
+          var cellContent = jsonData[i][key];
+          if (key == "년월") {
+            // Convert the number to a string
+            const dateString = cellContent.toString();
+            const year = dateString.slice(0, 4);
+            const month = dateString.slice(4, 6);
+            cellContent = `${year}-${month}`;
 
-          if (dateString == "202311") {
-            check_202311 = true;
+            if (dateString == "202311") {
+              check_202311 = true;
+            }
+          } else if (!isNaN(cellContent)) {
+            cellContent = formatNumberWithCommas(cellContent);
+            cell.style.textAlign = "right";
           }
-        } else if (!isNaN(cellContent)) {
-          cellContent = formatNumberWithCommas(cellContent);
-          cell.style.textAlign = "right";
-        }
-        if (key == "쿠폰" || key == "분담금") {
-          cell.style.textAlign = "right";
-        }
+          if (key == "쿠폰" || key == "분담금") {
+            cell.style.textAlign = "right";
+          }
 
-        cell.textContent = cellContent;
-        row.appendChild(cell);
+          cell.textContent = cellContent;
+          row.appendChild(cell);
+        }
       }
     }
     tbody.appendChild(row);
   }
   table.appendChild(tbody);
-
-  //header_Get from jsonData
-  function getKeysWithTerm(obj, term) {
-    let keys = [];
-    for (let key in obj) {
-      if (key.includes(term)) {
-        keys.push(key);
-      }
-    }
-    return keys;
-  }
 
   // Add the sum row
   var sumRow = document.createElement("tr");
@@ -532,15 +756,12 @@ function jsonToTable(jsonData, filename) {
   }
 
   if (filename.includes("baedal")) {
-    var pay_first = getKeysWithTerm(jsonData[0], "과금1차");
-    var pay_second = getKeysWithTerm(jsonData[0], "과금2차");
-
-    var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
+    // var sumColumns = ["건수", "총합계", `${pay_first}`, `${pay_second}`];
+    var sumColumns = ["건수", "총합계", "과금1차", "과금2차"];
     // var sumColumns = ["건수", "총합계"];
   } else if (filename.includes("coupang")) {
-    var pay_copang = getKeysWithTerm(jsonData[0], "과금");
-
-    var sumColumns = ["건수", "총합계", `${pay_copang}`];
+    // var sumColumns = ["건수", "총합계", `${pay_coupang}`];
+    var sumColumns = ["건수", "총합계", "과금"];
     // var sumColumns = ["건수", "총합계"];
   }
   for (var i = 0; i < sumColumns.length; i++) {
@@ -554,7 +775,7 @@ function jsonToTable(jsonData, filename) {
     } else {
       temp_text = String(
         formatNumberWithCommas(
-          Math.round(calculateSum(jsonData, sumColumns[i]))
+          Math.round(calculateSum(jsonData, sumColumns[i], jsonToTable_month))
         )
       );
       if (sumColumns[i] == "건수") {
@@ -603,11 +824,140 @@ function jsonToTable(jsonData, filename) {
   }
 }
 
+function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
+  console.log(jsonToTableAds_month);
+  // console.log(jsonData)
+  // console.log(brandCheck)
+  // console.log(Object.keys(jsonData).length);
+
+  for (let i = 0; i < brandCheck.length; i++) {
+    for (let j = 0; j < Object.keys(jsonData).length; j++) {
+      if (brandCheck[i] === Object.keys(jsonData)[j]) {
+        // console.log(brandCheck[i]);
+
+        ads_sum = 0;
+        ads_store = 0;
+        ads_compy = 0;
+
+        const matchedValue = jsonData[Object.keys(jsonData)[j]];
+        // console.log(matchedValue);
+
+        //make table // similar with jsonToTable
+        //make table // similar with jsonToTable
+        //make table // similar with jsonToTable
+
+        // Create and append the title element
+        var titleElement = createTitle(brandCheck[i]);
+
+        if (localStorage.username === "admin") {
+          var tableContainer = document.getElementById("modal_body_ea");
+        } else {
+          var tableContainer = document.getElementById("tableContainer");
+        }
+
+        var table = document.createElement("table");
+        table.classList.add(
+          "table",
+          "table-striped",
+          "table-bordered",
+          "table-hover",
+          "jsonData3",
+          "mt-4"
+        );
+
+        // Create table header
+        var header = document.createElement("thead");
+        var headerRow = document.createElement("tr");
+        matchedValue[0].forEach((headerText, index) => {
+          if (index !== matchedValue[0].length - 1) {
+            var th = document.createElement("th");
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+            if (index > 1) {
+              th.style.textAlign = "right";
+            }
+          }
+        });
+        header.appendChild(headerRow);
+        table.appendChild(header);
+
+        // Create table body
+        var tbody = document.createElement("tbody");
+        for (let i = 2; i < matchedValue.length; i++) {
+          if (matchedValue[i][0] === jsonToTableAds_month.replaceAll("-", "")) {
+            var row = document.createElement("tr");
+            matchedValue[i].forEach((cellText, index) => {
+              // console.log(matchedValue[i])
+              if (index !== matchedValue[0].length - 1) {
+                var td = document.createElement("td");
+                td.textContent = cellText;
+                // You can now use the 'index' variable here as needed
+                row.appendChild(td);
+                if (index > 1) {
+                  td.style.textAlign = "right";
+                  if (index === 3) {
+                    ads_sum += Number(cellText.replaceAll(",", ""));
+                  } else if (index === 4) {
+                    ads_store += Number(cellText.replaceAll(",", ""));
+                  } else if (index === 5) {
+                    ads_compy += Number(cellText.replaceAll(",", ""));
+                  }
+                }
+              }
+            });
+          }
+          // 광고내역 합계
+          if (i === matchedValue.length - 1) {
+            var row = document.createElement("tr");
+            row.classList.add("sum-row", "table-danger");
+            row.style.fontWeight = "bold";
+            sum_list = [
+              "합계",
+              "",
+              "",
+              "",
+              String(ads_sum.toLocaleString()),
+              String(ads_store.toLocaleString()),
+              String(ads_compy.toLocaleString()),
+            ];
+            sum_list.forEach((cellText, index) => {
+              if (index !== sum_list[0].length - 1) {
+                var td = document.createElement("td");
+                td.textContent = cellText;
+                // You can now use the 'index' variable here as needed
+                row.appendChild(td);
+                if (index > 1) {
+                  td.style.textAlign = "right";
+                }
+              }
+            });
+          }
+          tbody.appendChild(row);
+        }
+        console.log(row);
+        if (row) {
+          tableContainer.appendChild(titleElement);
+        }
+
+        // console.log(ads_sum)
+        // console.log(ads_store)
+        // console.log(ads_compy)
+
+        table.appendChild(tbody);
+        tableContainer.appendChild(table);
+      }
+    }
+  }
+}
+
 // Function to calculate the sum for a specific column
-function calculateSum(data, column) {
+function calculateSum(data, column, jsonToTable_month) {
   var sum = 0;
+  console.log(data);
   for (var i = 0; i < data.length; i++) {
-    sum += parseFloat(data[i][column]) || 0;
+    if (data[i]["년월"] == jsonToTable_month.replaceAll("-", "")) {
+      sum += parseFloat(data[i][column]) || 0;
+    }
   }
   return sum;
 }
@@ -615,13 +965,18 @@ function calculateSum(data, column) {
 function createTitle(filename) {
   var titleElement = document.createElement("h3");
   titleElement.id = "title";
-  titleElement.classList.add("text-center");
+  titleElement.classList.add("text-center", "mt-4");
   titleElement.style.marginBottom = "20px";
   titleElement.style.fontWeight = "bold";
   if (filename.includes("baedal")) {
-    titleElement.textContent = "배달의민족";
+    titleElement.textContent = "[판촉내역] 배달의민족";
+    titleElement.style.color = "blue";
   } else if (filename.includes("coupang")) {
-    titleElement.textContent = "쿠팡이츠";
+    titleElement.textContent = "[판촉내역] 쿠팡이츠";
+    titleElement.style.color = "blue";
+  } else {
+    titleElement.textContent = "[광고내역] " + filename;
+    titleElement.style.color = "red";
   }
   return titleElement;
 }
@@ -631,12 +986,15 @@ function formatNumberWithCommas(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function adminTotal() {
-  // console.log("admin total");
+function adminTotal(selectedDate) {
+  console.log(selectedDate);
+  console.log(localStorage.getItem("adminBtn"));
+
   url = "/api/AdminTotal/";
   const data = {
     token: localStorage.getItem("access"),
     username: localStorage.getItem("username"),
+    selectedDate: selectedDate,
   };
 
   fetch(url, {
@@ -648,20 +1006,28 @@ function adminTotal() {
   })
     .then((response) => response.json())
     .then((data) => {
-      adminData(data["adminData"], url);
+      adminData(data["adminData"], url, selectedDate);
     })
     .catch((error) => console.error("Error:", error));
 }
 
+//어드민 스타트 함수
 document.addEventListener("DOMContentLoaded", async function () {
+  start_function();
+});
+
+async function start_function() {
   const username_check = await getUserData();
 
   if (username_check === "admin") {
+    var reloadBtn = document.getElementById("reloadBtn");
+    reloadBtn.style.display = "none";
+
     // Function to create a button
-    function createButton(id, text) {
+    function createButton(id, text, btnClr) {
       var button = document.createElement("button");
       button.id = id;
-      button.className = "btn btn-primary btn-sm mr-1";
+      button.className = `btn btn-${btnClr} btn-sm mr-1`;
       button.type = "button";
       button.textContent = text;
       return button;
@@ -670,20 +1036,52 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Append buttons to the ul element
     var adminMenu = document.getElementById("admin_menu");
 
-    var button1 = createButton("admin_btn1", "총금액");
+    var button1 = createButton("admin_btn1", "총금액", "primary");
     button1.addEventListener("click", function () {
+      console.log("총금액 버튼 테스트");
+      document.getElementById("monthDropdown").removeAttribute("hidden");
+      //판촉내역, 광고내역
+      monthsList = showDate();
+      // Get the dropdown container element
+      var dropdownContainer_prom = document.getElementById(
+        "month_select_prom_dropdown"
+      );
+      //del children
+      var div = document.getElementById("month_select_prom_dropdown");
+      while (div.firstChild) {
+        div.removeChild(div.firstChild);
+      }
+      for (var i = 0; i < monthsList.length; i++) {
+        // Create a new monthItem for prom dropdown
+        var monthItem_prom = document.createElement("a");
+        monthItem_prom.setAttribute("class", "dropdown-item");
+        monthItem_prom.setAttribute("href", "#");
+        monthItem_prom.setAttribute(
+          "onclick",
+          `adminTotal('${monthsList[i]}')`
+        );
+        monthItem_prom.textContent = monthsList[i];
+
+        // Append the created item to the prom dropdown container
+        dropdownContainer_prom.appendChild(monthItem_prom);
+      }
+
       localStorage.setItem("adminBtn", "총금액");
       // Handle click for 총금액 button
       const body = document.getElementById("prom_table");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
       }
-      adminTotal();
+      monthsList = showDate();
+      selectedDate = monthsList[0];
+      adminTotal(selectedDate);
     });
     adminMenu.appendChild(button1);
 
-    var button2 = createButton("admin_btn2", "세부내역");
+    var button2 = createButton("admin_btn2", "세부내역", "primary");
     button2.addEventListener("click", function () {
+      console.log("세부내역 버튼 테스트");
+      document.getElementById("monthDropdown").removeAttribute("hidden");
       localStorage.setItem("adminBtn", "세부내역");
       // Handle click for 세부내역 button
       const body = document.getElementById("prom_table");
@@ -694,10 +1092,104 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
     adminMenu.appendChild(button2);
 
+    //button
+    var btnList = [
+      "배민(진행내역)",
+      "배민(정산내역)",
+      "쿠팡(정산내역)",
+      "요기요(정산내역)",
+    ];
+    for (var i = 0; i < btnList.length; i++) {
+      (function (index) {
+        var button = createButton(
+          "admin_btn" + (index + 3),
+          btnList[index],
+          "dark"
+        );
+        button.addEventListener("click", function () {
+          console.log(btnList[index] + " 버튼 테스트");
+          document
+            .getElementById("monthDropdown")
+            .setAttribute("hidden", "true");
+          localStorage.setItem("adminBtn", btnList[index]);
+
+          var card1_name = document.getElementById("card1_name");
+          page_name = localStorage.getItem("adminBtn");
+          card1_name.innerText = page_name;
+
+          var url = `/static/ai_front/json_files/data_reports/data_reports.json`;
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Handle the retrieved JSON data here
+              results = data[btnList[index].replace("(", "").replace(")", "")];
+              console.log(results);
+              // Handle click for the button
+              const body = document.getElementById("prom_table");
+              while (body.firstChild) {
+                body.removeChild(body.firstChild);
+              }
+
+              // Create the table element
+              var table = document.createElement("table");
+              table.classList.add("table", "jsonData4");
+
+              // Create table headers dynamically
+              var headers = Object.keys(results[0]);
+              var headerRow = document.createElement("tr");
+
+              headers.forEach(function (header) {
+                var th = document.createElement("th");
+                th.style.textAlign = "center";
+                th.textContent = header;
+                headerRow.appendChild(th);
+              });
+
+              table.appendChild(headerRow);
+
+              // Create table body dynamically
+              results.forEach(function (result) {
+                var row = document.createElement("tr");
+
+                headers.forEach(function (header, index) {
+                  var cell = document.createElement("td");
+
+                  if (index > 3) {
+                    // Add commas every three digits
+                    cell.textContent = formatNumberWithCommas(result[header]);
+                    cell.style.textAlign = "right";
+                  } else {
+                    cell.textContent = result[header];
+                    cell.style.textAlign = "center";
+                  }
+
+                  row.appendChild(cell);
+                });
+
+                table.appendChild(row);
+              });
+
+              // Append the table to the element with the ID 'prom_table'
+              body.appendChild(table);
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error);
+            });
+        });
+        adminMenu.appendChild(button);
+      })(i);
+    }
+
     var button3 = createButton("admin_btn3", "세부내역2");
     button3.addEventListener("click", function () {
       localStorage.setItem("adminBtn", "세부내역2");
       // Handle click for 세부내역2 button
+      document.getElementById("monthDropdown").setAttribute("hidden", true);
       const body = document.getElementById("prom_table");
       while (body.firstChild) {
         body.removeChild(body.firstChild);
@@ -706,7 +1198,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
     adminMenu.appendChild(button3);
   }
-});
+}
 
 //비밀번호 변경
 function changePassword() {
@@ -814,5 +1306,123 @@ function changePassword() {
         // console.log(data.message);
       })
       .catch((error) => console.error("Error:", error));
+  }
+}
+
+//페이지 새로고침
+function reloadPage() {
+  location.reload();
+}
+
+//양도양수 다운로드
+function download_yang(row_No) {
+  url = currentURL = window.location.href;
+  if (!url.includes("192.168.1.2:8001")) {
+    Swal.fire({
+      text: "http://192.168.1.2:8001/ 에서 다운로드가 가능합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+  } else {
+    console.log(row_No);
+    SetDate = document.getElementById(`${row_No}_1`).value;
+    RawId = document.getElementById(`${row_No}_4`).textContent;
+    console.log(SetDate, RawId);
+
+    if (SetDate == "") {
+      Swal.fire({
+        text: "날짜가 선택되지 않았습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById(`${row_No}_1`).focus();
+        }
+      });
+    } else {
+      // Make an API call
+      fetch("/api/YangDown/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: localStorage.access, // Pass the access token as "token"
+          username: localStorage.username,
+          SetDate: SetDate,
+          RawId: RawId,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          do_date = data.res.양도일;
+          do_baemin = data.res.양도.baemin;
+          do_coupang = data.res.양도.coupang;
+          soo_date = data.res.양수일;
+          soo_baemin = data.res.양수.baemin;
+          soo_coupang = data.res.양수.coupang;
+
+          const firstElementKey = Object.keys(do_baemin[0]);
+          const resultArray = [{}];
+          firstElementKey.forEach((key) => {
+            resultArray[0][key] = key;
+          });
+          console.log(resultArray);
+
+          list_csv = [
+            resultArray,
+            do_baemin,
+            do_coupang,
+            [{ 양도일: do_date[0] }],
+            resultArray,
+            soo_baemin,
+            soo_coupang,
+            [{ 양수일: soo_date[0] }],
+          ];
+
+          // Combine the CSV data
+          const combinedData = [];
+          for (const csvData of list_csv) {
+            if (csvData) {
+              // Add a null check here
+              combinedData.push(...csvData);
+            }
+          }
+          // console.log(combinedData);
+
+          function downloadCSV(data) {
+            const csv = data
+              .map((row) => Object.values(row).join(","))
+              .join("\n");
+            const blob = new Blob(["\ufeff", csv], {
+              type: "text/csv;charset=euc-kr;",
+            });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `양도양수_${RawId}.csv`);
+            document.body.appendChild(link);
+
+            link.click();
+            document.body.removeChild(link);
+          }
+
+          // Example usage with combined data
+          downloadCSV(combinedData);
+        })
+        .catch((error) => {
+          console.error("API error:", error);
+          Swal.fire({
+            text: "존재하지 않는 데이터입니다. 날짜를 확인하세요.",
+            icon: "warning",
+            confirmButtonText: "확인",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              document.getElementById(`${row_No}_1`).focus();
+            }
+          });
+        });
+    }
   }
 }

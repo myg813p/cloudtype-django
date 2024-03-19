@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+
+<script>
+    let text = "2024-03";
+    let startDate = new Date(text);
+    let endDate = new Date("2024-01");
+    let monthsList = [];
+
+    while (startDate >= endDate) {
+        let month = startDate.getMonth() + 1; // Adding 1 because months are zero-based
+        let formattedMonth = month < 10 ? `0${month}` : `${month}`;
+        let year = startDate.getFullYear();
+
+        monthsList.push(`${year}-${formattedMonth}`);
+
+        startDate.setMonth(startDate.getMonth() - 1);
+    }
+    console.log(monthsList);
+
+</script>
+
+</body>
+</html>
