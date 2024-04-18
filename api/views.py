@@ -103,23 +103,51 @@ class YangDown(TokenVerifyView):
                 CASE
                     WHEN YM LIKE '%2023%' AND brand = '떡참' THEN ROUND((쿠폰사용금액 * 0.5), 1) -- Adjust the ratio for 떡참 in 2023
                     WHEN YM LIKE '%2023%' THEN ROUND((쿠폰사용금액 * 0.7), 1) -- Adjust the ratio for other brands in 2023
-                    ELSE ROUND((쿠폰사용금액 * 0.6), 1) -- Adjust the ratio for 2024 and beyond
+                    ELSE 
+                        CASE
+                            -- VIP 프로모션, 배민 지원금 (두찜: 3500-500, 4500-1000 / 떡참: 4500-500, 5000-1000)
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 3500 OR 쿠폰사용금액 = 4500) THEN ROUND(((쿠폰사용금액 - 500) * 0.6), 1)
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 4000 OR 쿠폰사용금액 = 5000) THEN ROUND(((쿠폰사용금액 - 1000) * 0.6), 1)
+                            -- 기본 계산
+                            ELSE ROUND((쿠폰사용금액 * 0.6), 1)
+                        END
                 END AS 분담금,
                 COUNT(CASE WHEN 정산금액 != 0 THEN 1 END) AS 건수,
                 CASE
                     WHEN YM LIKE '%2023%' AND brand = '떡참' THEN ((쿠폰사용금액 * 0.5) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) -- Adjust the ratio for 총합계
                     WHEN YM LIKE '%2023%' THEN ((쿠폰사용금액 * 0.7) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) -- Adjust the ratio for 총합계 in 2024
-                    ELSE (쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))
+                    ELSE 
+                        CASE
+                            -- VIP 프로모션, 배민 지원금 (두찜: 3500-500, 4500-1000 / 떡참: 4500-500, 5000-1000)
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 3500 OR 쿠폰사용금액 = 4500) THEN ((쿠폰사용금액 - 500) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 4000 OR 쿠폰사용금액 = 5000) THEN ((쿠폰사용금액 - 1000) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))
+                            -- 기본 계산
+                            ELSE (쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) 
+                        END
                 END AS 총합계,
                 CASE
                     WHEN YM LIKE '%2023%' AND brand = '떡참' THEN ((쿠폰사용금액 * 0.5) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2  -- Adjust the ratio for 과금1차
                     WHEN YM LIKE '%2023%' THEN ((쿠폰사용금액 * 0.7) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2 -- Adjust the ratio for 과금1차 in 2024
-                    ELSE ((쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2
+                    ELSE 
+                        CASE
+                            -- VIP 프로모션, 배민 지원금 (두찜: 3500-500, 4500-1000 / 떡참: 4500-500, 5000-1000)
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 3500 OR 쿠폰사용금액 = 4500) THEN ((쿠폰사용금액 - 500) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 4000 OR 쿠폰사용금액 = 5000) THEN ((쿠폰사용금액 - 1000) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                            -- 기본 계산
+                            ELSE (쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                        END
                 END AS '과금1차',
                 CASE
                     WHEN YM LIKE '%2023%' AND brand = '떡참' THEN ((쿠폰사용금액 * 0.5) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2 -- Adjust the ratio for 과금2차
                     WHEN YM LIKE '%2023%' THEN ((쿠폰사용금액 * 0.7) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2 -- Adjust the ratio for 과금2차 in 2024
-                    ELSE ((쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END))) / 2
+                    ELSE 
+                        CASE
+                            -- VIP 프로모션, 배민 지원금 (두찜: 3500-500, 4500-1000 / 떡참: 4500-500, 5000-1000)
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 3500 OR 쿠폰사용금액 = 4500) THEN ((쿠폰사용금액 - 500) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                            WHEN YM LIKE '%202403%' AND 프로모션_구분 LIKE '%VIP%' AND (쿠폰사용금액 = 4000 OR 쿠폰사용금액 = 5000) THEN ((쿠폰사용금액 - 1000) * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                            -- 기본 계산
+                            ELSE (쿠폰사용금액 * 0.6) * (COUNT(CASE WHEN 정산금액 != 0 THEN 1 END)) / 2
+                        END
                 END AS '과금2차'
             FROM
                 prom_baemin

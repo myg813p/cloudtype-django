@@ -5,7 +5,7 @@ function showDate() {
   //Calculate DATE
   //Calculate DATE
   //Calculate DATE
-  let text = "2024-02";
+  let text = "2024-03";
   let startDate = new Date(text);
   let endDate = new Date("2024-01");
   let monthsList = [];
@@ -153,7 +153,15 @@ function adminStart(selectedDate) {
   ) {
     url = "/api/AdminData/";
   } else if (localStorage.adminBtn === "세부내역2") {
-    url = "/api/AdminData0/";
+    // // url = "/api/AdminData0/";
+    // var url = "/static/ai_front/json_files/data_detail2/202403_prom_detail2.xlsx";
+    // var a = document.createElement("a");
+    // a.download = "202403_prom_detail2.xlsx";
+    // a.href = url;
+    // document.body.appendChild(a);
+    // a.click();
+    // document.body.removeChild(a);
+    
   } else {
     url = "/api/AdminData/";
   }
@@ -512,10 +520,6 @@ function othersStart(biz_no, monthsList) {
         .replaceAll("-", "")
         .replaceAll("selected_prom", "")
         .replaceAll("selected_ads", "");
-      console.log(find_fee_month);
-      console.log(find_fee_month);
-      console.log(find_fee_month);
-      console.log(find_fee_month);
 
       if (dataFromUrl0.hasOwnProperty(find_fee_month)) {
         var fee_month = dataFromUrl0[find_fee_month];
@@ -685,7 +689,7 @@ function jsonToTable(jsonData, filename, jsonToTable_month, fee_month) {
       if (["년월", "브랜드", "행사"].includes(key)) {
         th.style.textAlign = "left";
       } else {
-        if (key.includes("과금")) {
+        if (key.includes("과금") && !key.includes("차")) {
           pay_coupang = `과금${fee_month["first_month"]}`;
           th.textContent = pay_coupang;
         } else if (key.includes("과금1차")) {
@@ -825,7 +829,6 @@ function jsonToTable(jsonData, filename, jsonToTable_month, fee_month) {
 }
 
 function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
-  console.log(jsonToTableAds_month);
   // console.log(jsonData)
   // console.log(brandCheck)
   // console.log(Object.keys(jsonData).length);
@@ -840,7 +843,6 @@ function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
         ads_compy = 0;
 
         const matchedValue = jsonData[Object.keys(jsonData)[j]];
-        // console.log(matchedValue);
 
         //make table // similar with jsonToTable
         //make table // similar with jsonToTable
@@ -884,7 +886,10 @@ function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
         // Create table body
         var tbody = document.createElement("tbody");
         for (let i = 2; i < matchedValue.length; i++) {
-          if (matchedValue[i][0] === jsonToTableAds_month.replaceAll("-", "")) {
+          // console.log(typeof(jsonToTableAds_month))
+          // console.log(jsonToTableAds_month)
+          // console.log(matchedValue)
+          if (matchedValue[i][0] == jsonToTableAds_month.replaceAll("-", "")) {
             var row = document.createElement("tr");
             matchedValue[i].forEach((cellText, index) => {
               // console.log(matchedValue[i])
@@ -906,6 +911,7 @@ function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
               }
             });
           }
+
           // 광고내역 합계
           if (i === matchedValue.length - 1) {
             var row = document.createElement("tr");
@@ -932,9 +938,10 @@ function jsonToTableAds(jsonData, brandCheck, jsonToTableAds_month) {
               }
             });
           }
+          if (row) {
           tbody.appendChild(row);
+          }
         }
-        console.log(row);
         if (row) {
           tableContainer.appendChild(titleElement);
         }
@@ -1098,6 +1105,7 @@ async function start_function() {
       "배민(정산내역)",
       "쿠팡(정산내역)",
       "요기요(정산내역)",
+      "땡겨요(정산내역)",
     ];
     for (var i = 0; i < btnList.length; i++) {
       (function (index) {
@@ -1407,6 +1415,7 @@ function download_yang(row_No) {
             link.click();
             document.body.removeChild(link);
           }
+
 
           // Example usage with combined data
           downloadCSV(combinedData);
