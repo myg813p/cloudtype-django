@@ -104,7 +104,7 @@ class UserView(APIView):
     def post(self, request):
         serializer = UserSignupSerializer(data=request.data)
 
-        if serializer.is_valid() and len(serializer.validated_data['biz_owner'])>=3:
+        if serializer.is_valid() and len(serializer.validated_data['biz_owner'])>=2:
             # arm_user = ArmUsers.objects.filter(biz_no=serializer.validated_data['biz_no']).first()
             arm_user = ArmUsers.objects.filter(biz_no=serializer.validated_data['biz_no'], biz_owner__contains=serializer.validated_data['biz_owner']).first()
 
