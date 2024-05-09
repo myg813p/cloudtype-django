@@ -71,10 +71,11 @@ def marketing_google_sheet_data():
     with open('ads.json', 'w', encoding='utf-8') as json_file:
         json.dump(result_dict, json_file, ensure_ascii=False)
 
-    print("Result saved to output.json")
-    quit()
+    print("ads.json")
+    # quit()
 
     values = result.get('values', [])
+    print(values)
 
     if not values:
         print('No data found.')
