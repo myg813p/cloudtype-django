@@ -153,14 +153,14 @@ function adminStart(selectedDate) {
   ) {
     url = "/api/AdminData/";
   } else if (localStorage.adminBtn === "세부내역2") {
-    // // url = "/api/AdminData0/";
-    // var url = "/static/ai_front/json_files/data_detail2/202403_prom_detail2.xlsx";
-    // var a = document.createElement("a");
-    // a.download = "202403_prom_detail2.xlsx";
-    // a.href = url;
-    // document.body.appendChild(a);
-    // a.click();
-    // document.body.removeChild(a);
+    // url = "/api/AdminData0/";
+    var url = "/static/ai_front/json_files/data_detail2/data_reports2.zip";
+    var a = document.createElement("a");
+    a.download = "data_reports2.zip";
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     
   } else {
     url = "/api/AdminData/";
